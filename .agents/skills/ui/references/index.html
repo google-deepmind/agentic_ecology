@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecology Active Learning</title>
+
+    <!-- M3 Fonts: Roboto for text, Material Symbols Outlined for icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+    <style>
+    /* =========================================================================
+       M3 DESIGN TOKENS — Light Scheme (Teal seed #006D5B)
+       https://m3.material.io/styles/color/static/baseline
+       ========================================================================= */
+    :root {
+        /* --- Color: Key Colors --- */
+        --md-sys-color-primary:               #006B5E;
+        --md-sys-color-on-primary:            #FFFFFF;
+        --md-sys-color-primary-container:     #74F8E2;
+        --md-sys-color-on-primary-container:  #00201B;
+
+        --md-sys-color-secondary:             #4A635D;
+        --md-sys-color-on-secondary:          #FFFFFF;
+        --md-sys-color-secondary-container:   #CCE8E0;
+        --md-sys-color-on-secondary-container:#06201B;
+
+        --md-sys-color-tertiary:              #436278;
+        --md-sys-color-on-tertiary:           #FFFFFF;
+        --md-sys-color-tertiary-container:    #C8E6FF;
+        --md-sys-color-on-tertiary-container: #001E30;
+
+        --md-sys-color-error:                 #BA1A1A;
+        --md-sys-color-on-error:              #FFFFFF;
+        --md-sys-color-error-container:       #FFDAD6;
+        --md-sys-color-on-error-container:    #410002;
+
+        /* --- Color: Surfaces --- */
+        --md-sys-color-surface:                 #F5FBF8;
+        --md-sys-color-surface-dim:             #D5DBD8;
+        --md-sys-color-surface-bright:          #F5FBF8;
+        --md-sys-color-on-surface:              #171D1B;
+        --md-sys-color-on-surface-variant:      #3F4946;
+
+        --md-sys-color-surface-container-lowest: #FFFFFF;
+        --md-sys-color-surface-container-low:    #EFF5F2;
+        --md-sys-color-surface-container:        #E9F0ED;
+        --md-sys-color-surface-container-high:   #E4EAE7;
+        --md-sys-color-surface-container-highest:#DEE5E2;
+
+        --md-sys-color-inverse-surface:     #2B3230;
+        --md-sys-color-inverse-on-surface:  #ECF2EF;
+        --md-sys-color-inverse-primary:     #54DBC6;
+
+        /* --- Color: Outline --- */
+        --md-sys-color-outline:         #6F7976;
+        --md-sys-color-outline-variant: #BFC9C5;
+
+        /* --- Color: Misc --- */
+        --md-sys-color-scrim:     #000000;
+        --md-sys-color-shadow:    #000000;
+
+        /* --- Color: Custom semantic (annotation) --- */
+        --color-positive:          #1B6D30;
+        --color-positive-container:#A3F5A4;
+        --color-on-positive-container:#002108;
+        --color-negative:          #BA1A1A;
+        --color-negative-container:#FFDAD6;
+        --color-on-negative-container:#410002;
+
+        /* --- Typography: M3 Type Scale ---
+             https://m3.material.io/styles/typography/overview
+             Using Roboto at M3-specified sizes, weights, tracking */
+        --md-sys-typescale-display-large:    700 57px/64px 'Roboto', sans-serif;
+        --md-sys-typescale-display-medium:   400 45px/52px 'Roboto', sans-serif;
+        --md-sys-typescale-display-small:    400 36px/44px 'Roboto', sans-serif;
+        --md-sys-typescale-headline-large:   400 32px/40px 'Roboto', sans-serif;
+        --md-sys-typescale-headline-medium:  400 28px/36px 'Roboto', sans-serif;
+        --md-sys-typescale-headline-small:   400 24px/32px 'Roboto', sans-serif;
+        --md-sys-typescale-title-large:      500 22px/28px 'Roboto', sans-serif;
+        --md-sys-typescale-title-medium:     500 16px/24px 'Roboto', sans-serif;
+        --md-sys-typescale-title-small:      500 14px/20px 'Roboto', sans-serif;
+        --md-sys-typescale-body-large:       400 16px/24px 'Roboto', sans-serif;
+        --md-sys-typescale-body-medium:      400 14px/20px 'Roboto', sans-serif;
+        --md-sys-typescale-body-small:       400 12px/16px 'Roboto', sans-serif;
+        --md-sys-typescale-label-large:      500 14px/20px 'Roboto', sans-serif;
+        --md-sys-typescale-label-medium:     500 12px/16px 'Roboto', sans-serif;
+        --md-sys-typescale-label-small:      500 11px/16px 'Roboto', sans-serif;
+
+        /* --- Shape Scale ---
+             https://m3.material.io/styles/shape/overview
+             None=0, XS=4px, S=8px, M=12px, L=16px, XL=28px, Full=9999px */
+        --md-sys-shape-none:        0px;
+        --md-sys-shape-extra-small: 4px;
+        --md-sys-shape-small:       8px;
+        --md-sys-shape-medium:      12px;
+        --md-sys-shape-large:       16px;
+        --md-sys-shape-extra-large: 28px;
+        --md-sys-shape-full:        9999px;
+
+        /* --- Elevation shadows (dp mapped to CSS box-shadow) ---
+             https://m3.material.io/styles/elevation/overview */
+        --md-sys-elevation-0: none;
+        --md-sys-elevation-1: 0 1px 2px 0 rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15);
+        --md-sys-elevation-2: 0 1px 2px 0 rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15);
+        --md-sys-elevation-3: 0 1px 3px 0 rgba(0,0,0,.3), 0 4px 8px 3px rgba(0,0,0,.15);
+        --md-sys-elevation-4: 0 2px 3px 0 rgba(0,0,0,.3), 0 6px 10px 4px rgba(0,0,0,.15);
+        --md-sys-elevation-5: 0 4px 4px 0 rgba(0,0,0,.3), 0 8px 12px 6px rgba(0,0,0,.15);
+
+        /* --- Motion --- */
+        --md-sys-motion-duration-short1:  50ms;
+        --md-sys-motion-duration-short2: 100ms;
+        --md-sys-motion-duration-short3: 150ms;
+        --md-sys-motion-duration-short4: 200ms;
+        --md-sys-motion-duration-medium1: 250ms;
+        --md-sys-motion-duration-medium2: 300ms;
+        --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+        --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+        /* --- State Layer Opacities ---
+             https://m3.material.io/foundations/interaction/states/overview */
+        --md-sys-state-hover-opacity:   0.08;
+        --md-sys-state-focus-opacity:   0.10;
+        --md-sys-state-pressed-opacity: 0.10;
+        --md-sys-state-dragged-opacity: 0.16;
+    }
+
+    /* =========================================================================
+       RESET & BASE
+       ========================================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+        height: 100%;
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-on-surface);
+        background: var(--md-sys-color-surface);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* M3 icon font baseline fix */
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+        line-height: 1;
+        display: inline-block;
+    }
+
+    /* =========================================================================
+       TOP APP BAR — M3 Small
+       https://m3.material.io/components/top-app-bar/overview
+       Container: surface-container, height 64px
+       ========================================================================= */
+    .top-app-bar {
+        height: 64px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--md-sys-color-surface-container);
+        color: var(--md-sys-color-on-surface);
+        flex-shrink: 0;
+        z-index: 4;
+    }
+
+    .top-app-bar__leading-icon {
+        width: 48px; height: 48px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: var(--md-sys-shape-full);
+        color: var(--md-sys-color-on-surface);
+        flex-shrink: 0;
+    }
+    .top-app-bar__leading-icon .material-symbols-outlined { font-size: 24px; }
+
+    .top-app-bar__title {
+        font: var(--md-sys-typescale-title-large);
+        letter-spacing: 0;
+        flex: 1;
+    }
+
+    .top-app-bar__trailing {
+        display: flex; align-items: center; gap: 8px;
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .top-app-bar__badge {
+        font: var(--md-sys-typescale-label-medium);
+        padding: 4px 12px;
+        border-radius: var(--md-sys-shape-small);
+        background: var(--md-sys-color-surface-container-highest);
+        color: var(--md-sys-color-on-surface);
+    }
+
+    /* =========================================================================
+       MAIN LAYOUT — Sidebar + Content
+       ========================================================================= */
+    .main-layout {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    /* =========================================================================
+       SIDEBAR — M3 Standard Navigation Drawer
+       https://m3.material.io/components/navigation-drawer/overview
+       Container: surface-container-low, width 360px
+       ========================================================================= */
+    .sidebar {
+        width: 360px;
+        flex-shrink: 0;
+        background: var(--md-sys-color-surface-container-low);
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--md-sys-color-outline-variant);
+        z-index: 2;
+    }
+
+    .sidebar__section {
+        padding: 16px;
+    }
+    .sidebar__section + .sidebar__section {
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+    }
+    .sidebar__section--grow {
+        flex: 1; overflow-y: auto;
+    }
+    .sidebar__section--footer {
+        flex-shrink: 0;
+        background: var(--md-sys-color-surface-container);
+    }
+
+    .sidebar__section-title {
+        font: var(--md-sys-typescale-title-small);
+        color: var(--md-sys-color-on-surface-variant);
+        letter-spacing: 0.1px;
+        margin-bottom: 12px;
+    }
+
+    /* --- M3 Dropdown (styled native select) --- */
+    .md-select-wrapper {
+        position: relative;
+    }
+    .md-select {
+        width: 100%;
+        height: 56px;
+        padding: 16px;
+        padding-right: 48px;
+        font: var(--md-sys-typescale-body-large);
+        color: var(--md-sys-color-on-surface);
+        background: transparent;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-extra-small);
+        appearance: none;
+        cursor: pointer;
+        transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+    }
+    .md-select:hover { border-color: var(--md-sys-color-on-surface); }
+    .md-select:focus {
+        outline: none;
+        border-color: var(--md-sys-color-primary);
+        border-width: 2px;
+        padding: 15px;
+        padding-right: 47px;
+    }
+    .md-select-wrapper::after {
+        content: 'expand_more';
+        font-family: 'Material Symbols Outlined';
+        font-size: 24px;
+        position: absolute;
+        right: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: var(--md-sys-color-on-surface-variant);
+        pointer-events: none;
+    }
+
+    /* --- Label list items --- */
+    .label-list { display: flex; flex-direction: column; gap: 4px; }
+
+    .label-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--md-sys-shape-full);
+        cursor: pointer;
+        transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+        position: relative;
+        user-select: none;
+    }
+    .label-item:hover {
+        background: rgba(0,0,0, var(--md-sys-state-hover-opacity));
+    }
+    .label-item:active {
+        background: rgba(0,0,0, var(--md-sys-state-pressed-opacity));
+    }
+    .label-item--active {
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+    }
+    .label-item--active:hover {
+        background: var(--md-sys-color-secondary-container);
+        filter: brightness(0.96);
+    }
+
+    .label-item__name {
+        font: var(--md-sys-typescale-label-large);
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .label-item__counts {
+        display: flex; gap: 6px; flex-shrink: 0;
+    }
+    .label-item__count {
+        font: var(--md-sys-typescale-label-small);
+        padding: 2px 8px;
+        border-radius: var(--md-sys-shape-full);
+    }
+    .label-item__count--pos {
+        background: var(--color-positive-container);
+        color: var(--color-on-positive-container);
+    }
+    .label-item__count--neg {
+        background: var(--color-negative-container);
+        color: var(--color-on-negative-container);
+    }
+
+    .label-placeholder {
+        font: var(--md-sys-typescale-body-small);
+        color: var(--md-sys-color-on-surface-variant);
+        text-align: center;
+        padding: 24px 16px;
+    }
+
+    /* --- New label input row --- */
+    .new-label-row {
+        display: none;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+    }
+    .new-label-row.visible { display: flex; }
+
+    /* --- M3 Outlined Text Field --- */
+    .md-text-field {
+        height: 40px;
+        flex: 1;
+        padding: 0 16px;
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-on-surface);
+        background: transparent;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-extra-small);
+        transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+    }
+    .md-text-field::placeholder { color: var(--md-sys-color-on-surface-variant); }
+    .md-text-field:hover { border-color: var(--md-sys-color-on-surface); }
+    .md-text-field:focus {
+        outline: none;
+        border-color: var(--md-sys-color-primary);
+        border-width: 2px;
+        padding: 0 15px;
+    }
+
+    /* --- Classifier metrics card (M3 filled card) --- */
+    .metrics-card {
+        background: var(--md-sys-color-surface-container-highest);
+        border-radius: var(--md-sys-shape-medium);
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .metrics-card.hidden { display: none; }
+    .metrics-card__title {
+        font: var(--md-sys-typescale-label-small);
+        color: var(--md-sys-color-on-surface-variant);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+    .metrics-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .metric__label {
+        font: var(--md-sys-typescale-label-small);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .metric__value {
+        font: var(--md-sys-typescale-title-medium);
+        color: var(--md-sys-color-on-surface);
+    }
+
+    .classifier-status {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    .classifier-status__label {
+        font: var(--md-sys-typescale-title-small);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .status-badge {
+        font: var(--md-sys-typescale-label-small);
+        padding: 2px 8px;
+        border-radius: var(--md-sys-shape-full);
+        background: var(--md-sys-color-surface-container-highest);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .status-badge--trained {
+        background: var(--color-positive-container);
+        color: var(--color-on-positive-container);
+    }
+
+    /* =========================================================================
+       M3 BUTTONS
+       https://m3.material.io/components/buttons/overview
+       ========================================================================= */
+
+    /* Filled button */
+    .md-btn-filled {
+        height: 40px;
+        padding: 0 24px;
+        font: var(--md-sys-typescale-label-large);
+        letter-spacing: 0.1px;
+        color: var(--md-sys-color-on-primary);
+        background: var(--md-sys-color-primary);
+        border: none;
+        border-radius: var(--md-sys-shape-full);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+        position: relative;
+        overflow: hidden;
+    }
+    .md-btn-filled:hover {
+        box-shadow: var(--md-sys-elevation-1);
+    }
+    .md-btn-filled:active { box-shadow: var(--md-sys-elevation-0); }
+    .md-btn-filled:disabled {
+        background: rgba(0,0,0,0.12);
+        color: rgba(0,0,0,0.38);
+        box-shadow: none;
+        cursor: default;
+    }
+    .md-btn-filled .material-symbols-outlined { font-size: 18px; }
+
+    /* Tonal button */
+    .md-btn-tonal {
+        height: 40px;
+        padding: 0 24px;
+        font: var(--md-sys-typescale-label-large);
+        letter-spacing: 0.1px;
+        color: var(--md-sys-color-on-secondary-container);
+        background: var(--md-sys-color-secondary-container);
+        border: none;
+        border-radius: var(--md-sys-shape-full);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+    }
+    .md-btn-tonal:hover { box-shadow: var(--md-sys-elevation-1); }
+    .md-btn-tonal:active { box-shadow: var(--md-sys-elevation-0); }
+    .md-btn-tonal:disabled {
+        background: rgba(0,0,0,0.12);
+        color: rgba(0,0,0,0.38);
+        box-shadow: none;
+        cursor: default;
+    }
+    .md-btn-tonal .material-symbols-outlined { font-size: 18px; }
+
+    /* Outlined button */
+    .md-btn-outlined {
+        height: 40px;
+        padding: 0 24px;
+        font: var(--md-sys-typescale-label-large);
+        letter-spacing: 0.1px;
+        color: var(--md-sys-color-primary);
+        background: transparent;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-full);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+    .md-btn-outlined:hover {
+        background: rgba(0, 107, 94, var(--md-sys-state-hover-opacity));
+    }
+    .md-btn-outlined:disabled {
+        border-color: rgba(0,0,0,0.12);
+        color: rgba(0,0,0,0.38);
+        cursor: default;
+        background: transparent;
+    }
+
+    /* =========================================================================
+       CONTENT AREA
+       ========================================================================= */
+    .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    /* --- Search Toolbar --- */
+    .search-toolbar {
+        height: 64px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--md-sys-color-surface);
+        border-bottom: 1px solid var(--md-sys-color-outline-variant);
+        flex-shrink: 0;
+    }
+
+    .search-toolbar__left {
+        display: flex; align-items: center; gap: 12px; flex: 1;
+    }
+    .search-toolbar__right {
+        display: flex; align-items: center; gap: 16px;
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* M3 Segmented Button
+       https://m3.material.io/components/segmented-buttons/overview */
+    .segmented-btn-group {
+        display: inline-flex;
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-full);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .segmented-btn {
+        height: 40px;
+        padding: 0 16px;
+        font: var(--md-sys-typescale-label-large);
+        letter-spacing: 0.1px;
+        color: var(--md-sys-color-on-surface);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+        position: relative;
+    }
+    .segmented-btn + .segmented-btn {
+        border-left: 1px solid var(--md-sys-color-outline);
+    }
+    .segmented-btn:hover:not(.segmented-btn--active):not(:disabled) {
+        background: rgba(0,0,0, var(--md-sys-state-hover-opacity));
+    }
+    .segmented-btn--active {
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+    }
+    .segmented-btn:disabled {
+        color: rgba(0,0,0,0.38);
+        cursor: default;
+    }
+    .segmented-btn .material-symbols-outlined { font-size: 18px; }
+
+    /* Search input row */
+    .search-input-row {
+        display: flex; align-items: center; gap: 8px; flex: 1;
+    }
+    .search-input-wrapper {
+        position: relative; flex: 1;
+    }
+    .search-input-wrapper .material-symbols-outlined {
+        position: absolute;
+        left: 12px; top: 50%;
+        transform: translateY(-50%);
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 20px;
+        pointer-events: none;
+    }
+    .search-input {
+        width: 100%;
+        height: 40px;
+        padding: 0 16px 0 40px;
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-on-surface);
+        background: var(--md-sys-color-surface-container-high);
+        border: none;
+        border-radius: var(--md-sys-shape-full);
+        transition: background var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+    }
+    .search-input::placeholder { color: var(--md-sys-color-on-surface-variant); }
+    .search-input:hover { background: var(--md-sys-color-surface-container-highest); }
+    .search-input:focus {
+        outline: 2px solid var(--md-sys-color-primary);
+        outline-offset: -2px;
+        background: var(--md-sys-color-surface-container-highest);
+    }
+
+    /* Page size select (compact) */
+    .compact-select {
+        height: 32px;
+        padding: 0 8px;
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface);
+        border: 1px solid var(--md-sys-color-outline-variant);
+        border-radius: var(--md-sys-shape-extra-small);
+        background: transparent;
+        cursor: pointer;
+    }
+    .compact-select:focus { outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+
+    /* M3 Checkbox (styled) */
+    .md-checkbox-row {
+        display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .md-checkbox-row input[type="checkbox"] {
+        width: 18px; height: 18px;
+        accent-color: var(--md-sys-color-primary);
+        cursor: pointer;
+    }
+
+    /* =========================================================================
+       RESULTS AREA
+       ========================================================================= */
+    .results-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        min-height: 0;
+    }
+
+    /* Zero state */
+    .zero-state {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 16px;
+    }
+    .zero-state__icon {
+        width: 64px; height: 64px;
+        border-radius: var(--md-sys-shape-full);
+        background: var(--md-sys-color-surface-container-high);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .zero-state__icon .material-symbols-outlined {
+        font-size: 28px;
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .zero-state__title {
+        font: var(--md-sys-typescale-title-medium);
+        color: var(--md-sys-color-on-surface);
+    }
+    .zero-state__body {
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-on-surface-variant);
+        max-width: 360px;
+    }
+
+    /* Query preview (M3 outlined card) */
+    .query-preview {
+        margin-bottom: 24px;
+    }
+    .query-preview.hidden { display: none; }
+    .query-preview__heading {
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface-variant);
+        margin-bottom: 8px;
+    }
+    .query-preview__card {
+        max-width: 400px;
+        background: var(--md-sys-color-surface);
+        border: 1px solid var(--md-sys-color-outline-variant);
+        border-radius: var(--md-sys-shape-medium);
+        overflow: hidden;
+    }
+    .query-preview__header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px;
+    }
+    .query-preview__title {
+        font: var(--md-sys-typescale-label-large);
+        color: var(--md-sys-color-on-surface);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        flex: 1;
+    }
+    .query-preview__badge {
+        font: var(--md-sys-typescale-label-small);
+        padding: 2px 8px;
+        border-radius: var(--md-sys-shape-full);
+        background: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container);
+        flex-shrink: 0;
+        margin-left: 8px;
+    }
+    .query-preview__media {
+        position: relative;
+        aspect-ratio: 16/10;
+        background: var(--md-sys-color-surface-container-highest);
+        cursor: pointer;
+    }
+    .query-preview__media img {
+        width: 100%; height: 100%; object-fit: cover;
+        display: block;
+    }
+    .query-preview__progress {
+        position: absolute;
+        top: 0; bottom: 0; left: 0;
+        width: 2px;
+        background: var(--md-sys-color-primary);
+        opacity: 0;
+        pointer-events: none;
+        transition: left 75ms linear;
+    }
+
+    /* Loading spinner */
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 0;
+        gap: 16px;
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .loading-state .material-symbols-outlined {
+        font-size: 28px;
+        color: var(--md-sys-color-primary);
+        animation: spin 1s linear infinite;
+    }
+    .loading-state__text {
+        font: var(--md-sys-typescale-body-medium);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error state */
+    .error-state {
+        text-align: center; padding: 64px 0;
+    }
+    .error-state .material-symbols-outlined {
+        font-size: 28px;
+        color: var(--md-sys-color-error);
+    }
+    .error-state__text {
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-error);
+        margin-top: 8px;
+    }
+
+    /* =========================================================================
+       RESULTS GRID — M3 Outlined Cards
+       https://m3.material.io/components/cards/overview
+       ========================================================================= */
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .result-card {
+        background: var(--md-sys-color-surface);
+        border: 1px solid var(--md-sys-color-outline-variant);
+        border-radius: var(--md-sys-shape-medium);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+                    box-shadow var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+    .result-card:hover {
+        box-shadow: var(--md-sys-elevation-1);
+    }
+    .result-card--positive {
+        border-color: var(--color-positive);
+        background: color-mix(in srgb, var(--color-positive-container) 20%, var(--md-sys-color-surface));
+    }
+    .result-card--negative {
+        border-color: var(--color-negative);
+        background: color-mix(in srgb, var(--color-negative-container) 20%, var(--md-sys-color-surface));
+    }
+
+    .result-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 12px 16px 8px;
+    }
+    .result-card__title {
+        font: var(--md-sys-typescale-body-small);
+        color: var(--md-sys-color-on-surface);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+    }
+    .result-card__score {
+        font: var(--md-sys-typescale-label-small);
+        color: var(--md-sys-color-on-surface-variant);
+        background: var(--md-sys-color-surface-container-high);
+        padding: 2px 8px;
+        border-radius: var(--md-sys-shape-full);
+        flex-shrink: 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Card media (spectrogram) */
+    .result-card__media {
+        position: relative;
+        aspect-ratio: 16/10;
+        background: var(--md-sys-color-surface-container-highest);
+        margin: 0 12px;
+        border-radius: var(--md-sys-shape-small);
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .result-card__media-placeholder {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        font: var(--md-sys-typescale-label-small);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .result-card__media img {
+        position: relative; z-index: 1;
+        width: 100%; height: 100%; object-fit: cover;
+        display: block;
+    }
+    .result-card__progress {
+        position: absolute;
+        top: 0; bottom: 0; left: 0;
+        width: 2px;
+        background: var(--md-sys-color-primary);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 2;
+        transition: left 75ms linear;
+    }
+
+    /* Card actions — M3 segmented-style annotation buttons */
+    .result-card__actions {
+        display: flex;
+        padding: 8px 12px 12px;
+        gap: 8px;
+    }
+    .annotation-btn {
+        flex: 1;
+        height: 32px;
+        font: var(--md-sys-typescale-label-medium);
+        letter-spacing: 0.5px;
+        border: 1px solid var(--md-sys-color-outline-variant);
+        border-radius: var(--md-sys-shape-full);
+        background: transparent;
+        color: var(--md-sys-color-on-surface-variant);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+                    border-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+    .annotation-btn:hover {
+        background: rgba(0,0,0, var(--md-sys-state-hover-opacity));
+    }
+    .annotation-btn--active-pos {
+        background: var(--color-positive-container);
+        color: var(--color-on-positive-container);
+        border-color: var(--color-positive);
+    }
+    .annotation-btn--active-pos:hover { filter: brightness(0.96); background: var(--color-positive-container); }
+    .annotation-btn--active-neg {
+        background: var(--color-negative-container);
+        color: var(--color-on-negative-container);
+        border-color: var(--color-negative);
+    }
+    .annotation-btn--active-neg:hover { filter: brightness(0.96); background: var(--color-negative-container); }
+
+    .annotation-btn--clear {
+        flex: 0 0 32px;
+        padding: 0;
+    }
+    .annotation-btn--clear .material-symbols-outlined { font-size: 18px; }
+
+    /* =========================================================================
+       PAGINATION FOOTER
+       ========================================================================= */
+    .pagination-bar {
+        height: 56px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--md-sys-color-surface-container-low);
+        border-top: 1px solid var(--md-sys-color-outline-variant);
+        flex-shrink: 0;
+    }
+    .pagination-bar__info {
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface-variant);
+    }
+    .pagination-bar__controls {
+        display: flex; align-items: center; gap: 4px;
+    }
+    .page-btn {
+        min-width: 32px; height: 32px;
+        padding: 0 8px;
+        font: var(--md-sys-typescale-label-medium);
+        color: var(--md-sys-color-on-surface);
+        background: transparent;
+        border: none;
+        border-radius: var(--md-sys-shape-full);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+    }
+    .page-btn:hover { background: rgba(0,0,0, var(--md-sys-state-hover-opacity)); }
+    .page-btn--active {
+        background: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+    }
+    .page-btn--active:hover {
+        background: var(--md-sys-color-primary);
+        filter: brightness(1.08);
+    }
+    .page-btn:disabled {
+        color: rgba(0,0,0,0.38);
+        cursor: default;
+        background: transparent;
+    }
+
+    /* =========================================================================
+       UTILITIES
+       ========================================================================= */
+    .visually-hidden {
+        position: absolute; width: 1px; height: 1px;
+        margin: -1px; padding: 0; overflow: hidden;
+        clip: rect(0,0,0,0); border: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- ====== TOP APP BAR (M3 Small) ====== -->
+    <header class="top-app-bar">
+        <div class="top-app-bar__leading-icon">
+            <span class="material-symbols-outlined">eco</span>
+        </div>
+        <span class="top-app-bar__title">Ecology Active Learning</span>
+        <div class="top-app-bar__trailing">
+            <span>Workspace:</span>
+            <span id="active-db-badge" class="top-app-bar__badge">No database</span>
+        </div>
+    </header>
+
+    <!-- ====== MAIN LAYOUT ====== -->
+    <div class="main-layout">
+
+        <!-- ====== SIDEBAR (M3 Navigation Drawer) ====== -->
+        <aside class="sidebar">
+            <!-- Database Selector -->
+            <div class="sidebar__section">
+                <div class="sidebar__section-title">Database</div>
+                <div class="md-select-wrapper">
+                    <select id="db-select" class="md-select" onchange="selectDatabase(this.value)">
+                        <option value="">Choose a database</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Target Labels -->
+            <div class="sidebar__section sidebar__section--grow">
+                <div class="sidebar__section-title">Target Labels</div>
+                <div id="labels-container" class="label-list">
+                    <div class="label-placeholder">Select a database to view labels</div>
+                </div>
+                <div id="custom-label-creator" class="new-label-row">
+                    <input type="text" id="new-label-input" class="md-text-field"
+                           placeholder="New label name…">
+                    <button class="md-btn-tonal" onclick="createNewLabel()">Add</button>
+                </div>
+            </div>
+
+            <!-- Classifier Controls -->
+            <div class="sidebar__section sidebar__section--footer">
+                <div id="classifier-section" style="display:none;">
+                    <div class="classifier-status">
+                        <span class="classifier-status__label">Classifier</span>
+                        <span id="model-status" class="status-badge">Untrained</span>
+                    </div>
+                    <div id="metrics-card" class="metrics-card hidden">
+                        <div class="metrics-card__title">Evaluation Metrics</div>
+                        <div class="metrics-grid">
+                            <div>
+                                <div class="metric__label">Accuracy</div>
+                                <div id="metric-accuracy" class="metric__value">—</div>
+                            </div>
+                            <div>
+                                <div class="metric__label">Samples</div>
+                                <div id="metric-samples" class="metric__value">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-train" class="md-btn-filled" style="width:100%"
+                            onclick="trainClassifier()">
+                        <span class="material-symbols-outlined">model_training</span>
+                        Train Classifier
+                    </button>
+                </div>
+                <div id="classifier-placeholder" class="label-placeholder">
+                    Select a label to configure the classifier
+                </div>
+            </div>
+        </aside>
+
+        <!-- ====== CONTENT AREA ====== -->
+        <main class="content-area">
+            <!-- Search Toolbar -->
+            <div class="search-toolbar">
+                <div class="search-toolbar__left">
+                    <!-- M3 Segmented Buttons -->
+                    <div class="segmented-btn-group">
+                        <button id="btn-mode-query" class="segmented-btn segmented-btn--active"
+                                onclick="setSearchMode('query')">
+                            <span class="material-symbols-outlined">check</span>
+                            Similarity
+                        </button>
+                        <button id="btn-mode-classifier" class="segmented-btn"
+                                onclick="setSearchMode('classifier')" disabled>
+                            Classifier
+                        </button>
+                    </div>
+                    <input type="hidden" id="search-mode" value="query">
+
+                    <!-- Search bar -->
+                    <div class="search-input-row">
+                        <div class="search-input-wrapper">
+                            <span class="material-symbols-outlined">search</span>
+                            <input type="text" id="query-uri" class="search-input"
+                                   placeholder="Enter query URI (e.g. xc105133)…">
+                        </div>
+                        <button class="md-btn-filled" onclick="performSearch()">Search</button>
+                    </div>
+                </div>
+
+                <div class="search-toolbar__right">
+                    <span>Sort:</span>
+                    <select id="sort-order" class="compact-select"
+                            onchange="filterAndSortResults();">
+                        <option value="desc" selected>Score &darr;</option>
+                        <option value="asc">Score &uarr;</option>
+                    </select>
+
+                    <label for="rows-per-page" class="visually-hidden">Page size</label>
+                    <span>Rows:</span>
+                    <select id="rows-per-page" class="compact-select"
+                            onchange="currentPage=1; showPage(1);">
+                        <option value="12">12</option>
+                        <option value="24" selected>24</option>
+                        <option value="48">48</option>
+                        <option value="-1">All</option>
+                    </select>
+
+                    <label class="md-checkbox-row">
+                        <input type="checkbox" id="chk-show-annotated" checked
+                               onchange="filterAndSortResults();">
+                        <span>Show labeled</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Results Scroll Area -->
+            <div id="results-scroll-container" class="results-scroll">
+                <!-- Zero State -->
+                <div id="zero-state" class="zero-state">
+                    <div class="zero-state__icon">
+                        <span class="material-symbols-outlined">explore</span>
+                    </div>
+                    <div class="zero-state__title">No database selected</div>
+                    <div class="zero-state__body">
+                        Choose a database from the sidebar to start exploring
+                        and annotating your bioacoustic recordings.
+                    </div>
+                </div>
+
+                <!-- Query Preview -->
+                <div id="query-preview-container" class="query-preview hidden">
+                    <div class="query-preview__heading">Active Query</div>
+                    <div class="query-preview__card">
+                        <div class="query-preview__header">
+                            <span id="query-preview-title" class="query-preview__title"></span>
+                            <span class="query-preview__badge">Query</span>
+                        </div>
+                        <div id="query-preview-media-container" class="query-preview__media"></div>
+                    </div>
+                </div>
+
+                <!-- Results Grid -->
+                <div id="results-body" class="results-grid" style="display:none;"></div>
+            </div>
+
+            <!-- Pagination Footer -->
+            <footer class="pagination-bar">
+                <span id="results-count" class="pagination-bar__info">No items</span>
+                <nav>
+                    <div id="pagination-controls" class="pagination-bar__controls"></div>
+                </nav>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ====== JAVASCRIPT ====== -->
+    <script>
+    /* =========================================================================
+       STATE
+       ========================================================================= */
+    let databases = [];
+    let activeDatabase = '';
+    let activeLabel = '';
+    let searchResults = [];
+    let processedResults = [];
+    let currentPage = 1;
+
+    document.addEventListener('DOMContentLoaded', loadDatabases);
+
+    /* =========================================================================
+       DATABASE & LABEL MANAGEMENT
+       ========================================================================= */
+    async function loadDatabases() {
+        try {
+            const res = await fetch('/api/databases');
+            const data = await res.json();
+            databases = data.databases || [];
+            const sel = document.getElementById('db-select');
+            sel.innerHTML = '<option value="">Choose a database</option>' +
+                databases.map(d => `<option value="${d}">${d}</option>`).join('');
+        } catch (e) { console.error('Failed to load databases:', e); }
+    }
+
+    async function selectDatabase(dbName) {
+        activeDatabase = dbName;
+        activeLabel = '';
+        searchResults = [];
+        processedResults = [];
+        currentPage = 1;
+
+        document.getElementById('active-db-badge').textContent =
+            dbName || 'No database';
+
+        if (!dbName) {
+            document.getElementById('zero-state').style.display = 'flex';
+            document.getElementById('results-body').style.display = 'none';
+            document.getElementById('custom-label-creator').classList.remove('visible');
+            document.getElementById('labels-container').innerHTML =
+                '<div class="label-placeholder">Select a database to view labels</div>';
+            return;
+        }
+
+        document.getElementById('zero-state').style.display = 'none';
+        document.getElementById('results-body').style.display = 'grid';
+        document.getElementById('custom-label-creator').classList.add('visible');
+
+        await loadLabels();
+        performSearch();
+    }
+
+    async function loadLabels() {
+        try {
+            const res = await fetch(
+                `/api/labels?database=${encodeURIComponent(activeDatabase)}`);
+            const data = await res.json();
+            let labels = data.labels || [];
+
+            if (activeLabel && !labels.some(l => l.name === activeLabel)) {
+                labels.push({ name: activeLabel, positive: 0, negative: 0 });
+            }
+            renderLabels(labels);
+        } catch (e) { console.error('Failed to load labels:', e); }
+    }
+
+    function renderLabels(labels) {
+        const c = document.getElementById('labels-container');
+        if (!labels.length) {
+            c.innerHTML = '<div class="label-placeholder">' +
+                'No labels yet. Create one below.</div>';
+            return;
+        }
+        c.innerHTML = labels.map(l => {
+            const active = activeLabel === l.name ? ' label-item--active' : '';
+            const counts = l.positive !== undefined
+                ? `<div class="label-item__counts">
+                     <span class="label-item__count label-item__count--pos">${l.positive}</span>
+                     <span class="label-item__count label-item__count--neg">${l.negative}</span>
+                   </div>` : '';
+            return `<div class="label-item${active}"
+                         onclick="selectLabel('${l.name.replace(/'/g,"\\'")}')">
+                      <span class="label-item__name">${l.name}</span>
+                      ${counts}
+                    </div>`;
+        }).join('');
+    }
+
+    function selectLabel(lbl) {
+        activeLabel = lbl;
+        loadLabels();
+
+        document.getElementById('classifier-placeholder').style.display = 'none';
+        document.getElementById('classifier-section').style.display = 'block';
+        document.getElementById('model-status').textContent = 'Untrained';
+        document.getElementById('model-status').className = 'status-badge';
+        document.getElementById('metrics-card').classList.add('hidden');
+
+        currentPage = 1;
+        performSearch();
+    }
+
+    async function createNewLabel() {
+        const input = document.getElementById('new-label-input');
+        const lbl = input.value.trim();
+        if (!lbl) return;
+        activeLabel = lbl;
+        input.value = '';
+        await loadLabels();
+        selectLabel(lbl);
+    }
+
+    /* =========================================================================
+       SEARCH MODE
+       ========================================================================= */
+    function setSearchMode(mode) {
+        const btnQ = document.getElementById('btn-mode-query');
+        const btnC = document.getElementById('btn-mode-classifier');
+        if (mode === 'classifier' && btnC.disabled) return;
+
+        document.getElementById('search-mode').value = mode;
+
+        if (mode === 'query') {
+            btnQ.classList.add('segmented-btn--active');
+            btnQ.innerHTML = '<span class="material-symbols-outlined">check</span> Similarity';
+            btnC.classList.remove('segmented-btn--active');
+            btnC.textContent = 'Classifier';
+        } else {
+            btnC.classList.add('segmented-btn--active');
+            btnC.innerHTML = '<span class="material-symbols-outlined">check</span> Classifier';
+            btnQ.classList.remove('segmented-btn--active');
+            btnQ.textContent = 'Similarity';
+        }
+        currentPage = 1;
+        performSearch();
+    }
+
+    /* =========================================================================
+       SEARCH
+       ========================================================================= */
+    async function performSearch() {
+        if (!activeDatabase) return;
+        const mode = document.getElementById('search-mode').value;
+        const queryUri = document.getElementById('query-uri').value;
+
+        document.getElementById('results-body').innerHTML =
+            '<div class="loading-state" style="grid-column:1/-1">' +
+            '  <span class="material-symbols-outlined">progress_activity</span>' +
+            '  <span class="loading-state__text">Scoring database…</span>' +
+            '</div>';
+
+        try {
+            const res = await fetch(
+                `/api/search?database=${encodeURIComponent(activeDatabase)}` +
+                `&mode=${mode}&label=${encodeURIComponent(activeLabel)}` +
+                `&query_uri=${encodeURIComponent(queryUri)}`);
+            const data = await res.json();
+            searchResults = data.results || [];
+
+            // Update classifier toggle state
+            const btnC = document.getElementById('btn-mode-classifier');
+            if (data.classifier_metrics && data.classifier_metrics.accuracy !== undefined) {
+                btnC.disabled = false;
+                document.getElementById('model-status').textContent = 'Trained';
+                document.getElementById('model-status').className = 'status-badge status-badge--trained';
+                const acc = data.classifier_metrics.accuracy;
+                document.getElementById('metric-accuracy').textContent =
+                    acc !== null && acc !== undefined ? acc.toFixed(3) : 'N/A';
+                document.getElementById('metric-samples').textContent =
+                    data.classifier_metrics.dataset_size ?? '—';
+                document.getElementById('metrics-card').classList.remove('hidden');
+            } else {
+                btnC.disabled = true;
+                if (document.getElementById('search-mode').value === 'classifier') {
+                    setSearchMode('query');
+                }
+            }
+
+            // Query preview
+            const qc = document.getElementById('query-preview-container');
+            const qm = document.getElementById('query-preview-media-container');
+            if (data.query && data.query.uri) {
+                document.getElementById('query-preview-title').textContent = data.query.uri;
+
+                const encDb = encodeURIComponent(activeDatabase);
+                const encUri = encodeURIComponent(data.query.uri);
+
+                if (data.query.media_type === 'audio') {
+                    qm.innerHTML = `
+                        <img id="query-preview-img" src="/api/preview?database=${encDb}&query_uri=${encUri}" alt="Query spectrogram">
+                        <div id="query-progress-bar" class="query-preview__progress"></div>
+                        <audio id="query-audio" class="visually-hidden" src="${data.query.url}" preload="none" onended="stopQueryAudio()"></audio>
+                    `;
+                    qm.setAttribute('onmouseenter', 'playQueryAudio()');
+                    qm.setAttribute('onmouseleave', 'stopQueryAudio()');
+                } else {
+                    qm.innerHTML = `
+                        <img id="query-preview-img" src="/api/preview?database=${encDb}&query_uri=${encUri}" alt="Query crop">
+                    `;
+                    qm.removeAttribute('onmouseenter');
+                    qm.removeAttribute('onmouseleave');
+                }
+                qc.classList.remove('hidden');
+            } else {
+                qc.classList.add('hidden');
+                qm.innerHTML = '';
+                qm.removeAttribute('onmouseenter');
+                qm.removeAttribute('onmouseleave');
+            }
+
+            filterAndSortResults();
+        } catch (err) {
+            console.error('Search failed:', err);
+            document.getElementById('results-body').innerHTML =
+                '<div class="error-state" style="grid-column:1/-1">' +
+                '  <span class="material-symbols-outlined">error</span>' +
+                `  <div class="error-state__text">Search failed: ${err.message}</div>` +
+                '</div>';
+        }
+    }
+
+    /* =========================================================================
+       FILTER / SORT / PAGINATE
+       ========================================================================= */
+    function filterAndSortResults(keepPage = false, scroll = true) {
+        const show = document.getElementById('chk-show-annotated').checked;
+        let filtered = searchResults.filter(r =>
+            show || !r.annotation || r.annotation.toUpperCase() === 'UNCERTAIN');
+
+        const order = document.getElementById('sort-order').value;
+        if (order === 'asc') {
+            filtered.sort((a, b) => {
+                if (a.score !== b.score) return a.score - b.score;
+                return a.id - b.id;
+            });
+        } else {
+            filtered.sort((a, b) => {
+                if (a.score !== b.score) return b.score - a.score;
+                return a.id - b.id;
+            });
+        }
+        processedResults = filtered;
+
+        if (!keepPage) { currentPage = 1; }
+        else {
+            const pp = parseInt(document.getElementById('rows-per-page').value);
+            if (pp !== -1) {
+                const tp = Math.ceil(processedResults.length / pp);
+                if (currentPage > tp) currentPage = Math.max(1, tp);
+            }
+        }
+        showPage(currentPage, scroll);
+    }
+
+    function showPage(page, scroll = true) {
+        const pp = parseInt(document.getElementById('rows-per-page').value);
+        const grid = document.getElementById('results-body');
+        let start = 0, end = processedResults.length;
+
+        // Pause all audio
+        grid.querySelectorAll('audio').forEach(a => a.pause());
+        stopQueryAudio();
+
+        if (pp !== -1) {
+            const tp = Math.ceil(processedResults.length / pp);
+            if (page < 1 || (tp > 0 && page > tp)) return;
+            currentPage = page;
+            start = (currentPage - 1) * pp;
+            end = Math.min(start + pp, processedResults.length);
+            renderPagination(tp);
+        } else {
+            document.getElementById('pagination-controls').innerHTML = '';
+        }
+
+        const items = processedResults.slice(start, end);
+        document.getElementById('results-count').textContent =
+            processedResults.length
+                ? `${start + 1}–${end} of ${processedResults.length}`
+                : 'No items';
+
+        if (!items.length) {
+            grid.innerHTML =
+                '<div class="label-placeholder" style="grid-column:1/-1">' +
+                'No matching records.</div>';
+            return;
+        }
+
+        grid.innerHTML = items.map(r => {
+            const isPos = r.annotation.toUpperCase() === 'POSITIVE';
+            const isNeg = r.annotation.toUpperCase() === 'NEGATIVE';
+            let mod = '';
+            if (isPos) mod = ' result-card--positive';
+            else if (isNeg) mod = ' result-card--negative';
+
+            const encDb = encodeURIComponent(activeDatabase);
+
+            let mediaHTML = '';
+            if (r.media_type === 'audio') {
+                mediaHTML = `
+                <div class="result-card__media" onmouseenter="playAudio(${r.id})" onmouseleave="stopAudio(${r.id})">
+                    <div class="result-card__media-placeholder">Loading…</div>
+                    <img src="/api/preview?database=${encDb}&item_id=${r.id}" alt="Spectrogram" loading="lazy">
+                    <div id="progress-bar-${r.id}" class="result-card__progress"></div>
+                    <audio id="audio-${r.id}" src="${r.media_url}" preload="none" onended="stopAudio(${r.id})" class="visually-hidden"></audio>
+                </div>
+                `;
+            } else {
+                mediaHTML = `
+                <div class="result-card__media">
+                    <div class="result-card__media-placeholder">Loading…</div>
+                    <img src="/api/preview?database=${encDb}&item_id=${r.id}" alt="Crop Preview" loading="lazy">
+                </div>
+                `;
+            }
+
+            return `
+            <div class="result-card${mod}" id="row-${r.id}">
+              <div class="result-card__header">
+                <span class="result-card__title" title="${r.title}">${r.title}</span>
+                <span class="result-card__score">${r.score.toFixed(4)}</span>
+              </div>
+              ${mediaHTML}
+              <div class="result-card__actions">
+                <button class="annotation-btn${isPos ? ' annotation-btn--active-pos' : ''}"
+                        onclick="submitAnnotation(${r.id},'positive')">
+                  <span class="material-symbols-outlined" style="font-size:16px">thumb_up</span>
+                  Pos
+                </button>
+                <button class="annotation-btn${isNeg ? ' annotation-btn--active-neg' : ''}"
+                        onclick="submitAnnotation(${r.id},'negative')">
+                  <span class="material-symbols-outlined" style="font-size:16px">thumb_down</span>
+                  Neg
+                </button>
+                <button class="annotation-btn annotation-btn--clear"
+                        onclick="submitAnnotation(${r.id},'uncertain')" title="Clear">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+                <button class="annotation-btn" onclick="searchSimilar(${r.id})" title="Search Similar">
+                  <span class="material-symbols-outlined" style="font-size:16px">search</span>
+                  Similar
+                </button>
+              </div>
+            </div>`;
+        }).join('');
+
+        if (scroll) {
+            document.getElementById('results-scroll-container').scrollTop = 0;
+        }
+    }
+
+    function renderPagination(totalPages) {
+        const c = document.getElementById('pagination-controls');
+        let h = `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="showPage(currentPage-1)">
+                    <span class="material-symbols-outlined" style="font-size:20px">chevron_left</span>
+                 </button>`;
+
+        const range = [];
+        // Always show page 1
+        range.push(1);
+
+        let start = Math.max(2, currentPage - 2);
+        let end = Math.min(totalPages - 1, currentPage + 2);
+
+        if (start > 2) {
+            range.push('...');
+        }
+
+        for (let i = start; i <= end; i++) {
+            range.push(i);
+        }
+
+        if (end < totalPages - 1) {
+            range.push('...');
+        }
+
+        if (totalPages > 1) {
+            range.push(totalPages);
+        }
+
+        for (const p of range) {
+            if (p === '...') {
+                h += `<span style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; color:var(--md-sys-color-on-surface-variant);">…</span>`;
+            } else {
+                h += `<button class="page-btn${p===currentPage?' page-btn--active':''}"
+                              onclick="showPage(${p})">${p}</button>`;
+            }
+        }
+
+        h += `<button class="page-btn" ${currentPage===totalPages?'disabled':''} onclick="showPage(currentPage+1)">
+                <span class="material-symbols-outlined" style="font-size:20px">chevron_right</span>
+              </button>`;
+        c.innerHTML = h;
+    }
+
+    /* =========================================================================
+       SEARCH SIMILAR
+       ========================================================================= */
+    function searchSimilar(itemId) {
+        document.getElementById('query-uri').value = `window:${itemId}`;
+        setSearchMode('query');
+        performSearch();
+    }
+
+    /* =========================================================================
+       AUDIO PLAYBACK (hover-to-play with progress bar)
+       ========================================================================= */
+    const animFrames = {};
+
+    function playAudio(id) {
+        const aud = document.getElementById(`audio-${id}`);
+        if (!aud) return;
+        // Pause others
+        document.querySelectorAll('#results-body audio').forEach(a => {
+            if (a.id !== `audio-${id}`) {
+                a.pause();
+                const oid = a.id.replace('audio-','');
+                cancelAnimationFrame(animFrames[oid]);
+                resetProgress(oid);
+            }
+        });
+        aud.play().then(() => startProgress(id)).catch(() => {});
+    }
+
+    function stopAudio(id) {
+        const aud = document.getElementById(`audio-${id}`);
+        if (!aud) return;
+        aud.pause(); aud.currentTime = 0;
+        cancelAnimationFrame(animFrames[id]);
+        resetProgress(id);
+    }
+
+    function startProgress(id) {
+        const aud = document.getElementById(`audio-${id}`);
+        const bar = document.getElementById(`progress-bar-${id}`);
+        if (!aud || !bar) return;
+        (function tick() {
+            if (!aud.paused && !aud.ended) {
+                const pct = (aud.currentTime / (aud.duration || 1)) * 100;
+                bar.style.left = pct + '%';
+                bar.style.opacity = '1';
+                animFrames[id] = requestAnimationFrame(tick);
+            }
+        })();
+    }
+
+    function resetProgress(id) {
+        const bar = document.getElementById(`progress-bar-${id}`);
+        if (bar) { bar.style.left = '0%'; bar.style.opacity = '0'; }
+    }
+
+    // Query audio
+    let queryFrame = null;
+    function playQueryAudio() {
+        const aud = document.getElementById('query-audio');
+        if (!aud) return;
+        document.querySelectorAll('#results-body audio').forEach(a => {
+            a.pause();
+            const oid = a.id.replace('audio-','');
+            cancelAnimationFrame(animFrames[oid]);
+            resetProgress(oid);
+        });
+        aud.play().then(() => {
+            const bar = document.getElementById('query-progress-bar');
+            (function tick() {
+                if (!aud.paused && !aud.ended) {
+                    const pct = (aud.currentTime / (aud.duration || 1)) * 100;
+                    bar.style.left = pct + '%';
+                    bar.style.opacity = '1';
+                    queryFrame = requestAnimationFrame(tick);
+                }
+            })();
+        }).catch(() => {});
+    }
+    function stopQueryAudio() {
+        const aud = document.getElementById('query-audio');
+        if (!aud) return;
+        aud.pause(); aud.currentTime = 0;
+        cancelAnimationFrame(queryFrame);
+        const bar = document.getElementById('query-progress-bar');
+        if (bar) { bar.style.left = '0%'; bar.style.opacity = '0'; }
+    }
+
+    /* =========================================================================
+       ANNOTATIONS
+       ========================================================================= */
+    async function submitAnnotation(itemId, type) {
+        if (!activeDatabase || !activeLabel) return;
+        try {
+            const res = await fetch('/api/annotation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    database: activeDatabase,
+                    item_id: itemId,
+                    label: activeLabel,
+                    annotation: type
+                })
+            });
+            if (!res.ok) { console.error('Annotation failed'); return; }
+
+            // Update client state
+            const idx = searchResults.findIndex(r => r.id === itemId);
+            if (idx !== -1) searchResults[idx].annotation = type;
+
+            await loadLabels();
+
+            // Update card visually in-place
+            const card = document.getElementById(`row-${itemId}`);
+            if (card) {
+                card.className = 'result-card' +
+                    (type === 'positive' ? ' result-card--positive' :
+                     type === 'negative' ? ' result-card--negative' : '');
+                const btns = card.querySelectorAll('.annotation-btn');
+                if (btns.length >= 2) {
+                    btns[0].className = 'annotation-btn' +
+                        (type === 'positive' ? ' annotation-btn--active-pos' : '');
+                    btns[1].className = 'annotation-btn' +
+                        (type === 'negative' ? ' annotation-btn--active-neg' : '');
+                }
+            }
+
+            if (!document.getElementById('chk-show-annotated').checked) {
+                filterAndSortResults(true, false);
+            }
+        } catch (e) { console.error('Annotation error:', e); }
+    }
+
+    /* =========================================================================
+       CLASSIFIER TRAINING
+       ========================================================================= */
+    function showSnackbar(message, isError = false) {
+        let bar = document.getElementById('snackbar');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'snackbar';
+            bar.style.cssText = `
+                position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+                min-width: 288px; max-width: 560px; padding: 14px 16px;
+                border-radius: 4px;
+                font: 400 14px/20px 'Roboto', sans-serif;
+                box-shadow: 0 1px 3px 0 rgba(0,0,0,.3), 0 4px 8px 3px rgba(0,0,0,.15);
+                z-index: 100; opacity: 0;
+                transition: opacity 300ms cubic-bezier(0.2, 0, 0, 1);
+            `;
+            document.body.appendChild(bar);
+        }
+        if (isError) {
+            bar.style.background = '#FFDAD6';
+            bar.style.color = '#410002';
+        } else {
+            bar.style.background = '#2B3230';
+            bar.style.color = '#ECF2EF';
+        }
+        bar.textContent = message;
+        bar.style.opacity = '1';
+        clearTimeout(bar._timer);
+        bar._timer = setTimeout(() => { bar.style.opacity = '0'; }, 6000);
+    }
+
+    async function trainClassifier() {
+        if (!activeDatabase || !activeLabel) return;
+        const btn = document.getElementById('btn-train');
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite">progress_activity</span> Training…';
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+            const res = await fetch(
+                `/api/train?database=${encodeURIComponent(activeDatabase)}` +
+                `&label=${encodeURIComponent(activeLabel)}`,
+                { method: 'POST', signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite">progress_activity</span> Refreshing…';
+                document.getElementById('btn-mode-classifier').disabled = false;
+                setSearchMode('classifier');
+            } else {
+                let errMsg = 'Training failed.';
+                try {
+                    const errData = await res.json();
+                    if (errData.error) errMsg = errData.error;
+                } catch (_) {}
+                showSnackbar(errMsg, true);
+            }
+        } catch (e) {
+            const msg = e.name === 'AbortError'
+                ? 'Training timed out. Try with fewer samples.'
+                : `Training error: ${e.message}`;
+            showSnackbar(msg, true);
+            console.error('Train error:', e);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    }
+    </script>
+</body>
+</html>

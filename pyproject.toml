@@ -1,0 +1,44 @@
+[project]
+# Project metadata. Available keys are documented at:
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata
+name = "agentic_ecology"
+description = "Agentic tools for ecological modelling"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+authors = [{name = "Agentic Ecology Authors", email="noreply@google.com"}]
+classifiers = [  # List of https://pypi.org/classifiers/
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Science/Research",
+]
+keywords = []
+
+dependencies = [
+    "perch-hoplite[tf,jax]",
+    "speciesnet",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/google-deepmind/agentic_ecology"
+repository = "https://github.com/google-deepmind/agentic_ecology"
+changelog = "https://github.com/google-deepmind/agentic_ecology/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+# Development deps (unittest, linting, formating,...)
+# Installed through `pip install -e .[dev]`
+dev = []
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv]
+constraint-dependencies = ["numba >= 0.59.0"]
+
+[tool.uv.sources]
+perch-hoplite = { git = "https://github.com/google-research/perch-hoplite.git" }

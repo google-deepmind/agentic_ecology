@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.cache/
+.pytest_cache/
+.pytype/
 
 # Distribution / packaging
 .Python
@@ -22,3 +25,22 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+poetry.lock
+
+# Other
+*.DS_Store
+.idea
+
+# Ignore generated docs
+docs/_build
+docs/api
+
+# Don't commit data or databases
+data/
+databases/
+
+# Allow tracking files in .agents (e.g., skills references)
+!.agents/
+
+# Force track .python-version
+!.python-version
