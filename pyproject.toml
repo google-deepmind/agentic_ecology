@@ -38,7 +38,13 @@ build-backend = "hatchling.build"
 source = "uv-dynamic-versioning"
 
 [tool.uv]
-constraint-dependencies = ["numba >= 0.59.0"]
+constraint-dependencies = [
+    "numba >= 0.59.0",
+    "torch < 2.13",
+]
+
 
 [tool.uv.sources]
 perch-hoplite = { git = "https://github.com/google-research/perch-hoplite.git" }
+
+
