@@ -1,0 +1,20 @@
+[project]
+name = "agentic-ecology"
+version = "0.1.0"
+description = "Agentic tools for ecological modelling"
+requires-python = ">=3.12"
+
+dependencies = [
+    "perch-hoplite[tf,jax,onnx]",
+    "speciesnet",
+]
+
+[tool.uv]
+package = false
+constraint-dependencies = [
+    "numba >= 0.59.0",
+    "torch < 2.13",
+]
+
+[tool.uv.sources]
+perch-hoplite = { git = "https://github.com/google-research/perch-hoplite.git" }

@@ -17,7 +17,7 @@
     directory.
 *   **Adherence to Skills & Templates:** You MUST closely review and adhere to
     the design patterns, utility functions (e.g., `sanitize_float` for JSON/JS
-    compatibility), and thread-safety patterns defined in the `.agents/skills/`
+    compatibility), and thread-safety patterns defined in the `skills/`
     templates. When transitioning from mock templates to real implementations,
     ensure all template-provided safety guards are fully preserved and applied
     to live data flows to prevent known edge-case failures (such as NaN
@@ -61,13 +61,3 @@ clogging logs.
         return "Executed SQL statement" not in record.getMessage()
     logging.getLogger("absl").addFilter(SQLSuppressFilter())
     ```
-
-### 3. Skill Authoring Guidelines (for `.agents/skills/`)
-
-*   **Separate Workflow from Reference:** Keep `SKILL.md` focused on high-level
-    workflow steps. Move CLI commands and code references to
-    `references/technical_reference.md`.
-*   **Address the Agent:** Skill instructions must address the agent directly in
-    the imperative mood.
-*   **Workspace Sandboxing:** Ensure all active scripts, templates, and server
-    processes copy files to the `agent_workspace/` directory before execution.

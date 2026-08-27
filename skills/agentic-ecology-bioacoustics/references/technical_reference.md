@@ -87,7 +87,7 @@ To query and inspect the database, use the following methods on the
 
 ### Backend
 
-Follow the best practices laid out in this repository's `ui` skill.
+Follow the best practices laid out in this repository's `agentic-ecology-ui` skill.
 
 #### SQLite Concurrency & Thread-Splitting
 

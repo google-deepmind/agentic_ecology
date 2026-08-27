@@ -6,9 +6,11 @@ processing, analyzing, and annotating their data. It currently focuses on
 passive acoustic monitoring (PAM) datasets (bioacoustics), with more
 capabilities to be introduced over time.
 
-Using Google's **Antigravity IDE**, you can generate custom python scripts,
-build interactive web interfaces to listen to and search your recordings, and
-train classifier models—all by describing what you want to do in plain English.
+Using an agentic development platform such as [**Google
+Antigravity**](https://antigravity.google/), you can generate custom python
+scripts, build interactive web interfaces to listen to and search your
+recordings, and train classifier models—all by describing what you want to do in
+plain English.
 
 ## Why?
 
@@ -27,68 +29,51 @@ Think of this project not as a tool, but as a tool-building tool.
 
 ## 🚀 Getting started
 
-Follow these step-by-step instructions to set up the environment and run your AI
-assistant.
+To get started, open your agentic development platform and prompt your agent:
 
-### 1. Install prerequisites
+> Help me get started with agentic ecology by following the README agent
+> instructions in https://github.com/google-deepmind/agentic_ecology.
 
-You need three tools installed on your computer: **Git**, **uv**, and the
-**Antigravity IDE**.
+### A word of caution
 
-#### A. Install Git (if you don't have it)
-
-Git is used to download the repository.
-
-*   **macOS / Linux**: Git is usually pre-installed. You can check by running
-    `git --version` in your terminal.
-*   **Windows**: Download and install it from
-    [git-scm.com](https://git-scm.com/).
-
-#### B. Install `uv`
-
-`uv` is a tool that installs the correct version of Python and manages all
-package dependencies automatically. Please refer to the
-[official uv installation guide](https://docs.astral.sh/uv/getting-started/installation/)
-to install it on your operating system (macOS, Linux, or Windows).
-
-#### C. Install Antigravity IDE
-
-The Antigravity IDE is Google's agentic development environment. Please follow
-the instructions on the
-[official Antigravity website](https://antigravity.google/download) to download
-and install the program on your machine.
+Unless you have extensive experience with agentic software engineering, we
+recommend that you set up your agentic coding environment so that the agent asks
+your permission before performing any operation on your machine on your behalf
+or to interact with files outside of the workspace's root directory. Vet every
+command the agent intends to run on your behalf and carefully inspect the code
+it requests to execute, as agent mistakes can happen. Avoid letting the agent
+perform operations on your data without backing it up and taking other relevant
+precautions.
 
 --------------------------------------------------------------------------------
 
-### 2. Set up the agentic ecology workspace in Antigravity IDE
+### 🤖 Agent instructions
 
-1.  Launch the **Antigravity IDE** application.
-2.  On the welcome screen, click **Clone Repository**.
-3.  Paste the repository URL:
-    `https://github.com/google-deepmind/agentic_ecology` and select a folder on
-    your computer.
-4.  Once cloned, you will see a prompt asking if you would like to open the
-    repository; click **Open** to open the project.
+If you are an AI agent tasked with setting up the environment, follow these
+step-by-step instructions.
 
-You are now ready to set up the workspace.
+#### 1. Verify and install prerequisites
 
-> **Warning:** Unless you have extensive experience with agentic software
-> engineering, we recommend that you set up your workspace so that the agent
-> asks your permission before performing any operation on your machine on your
-> behalf or to interact with files outside of the workspace's root directory.
-> Vet every command the agent intends to run on your behalf and carefully
-> inspect the code it requests to execute, as agent mistakes can happen. Avoid
-> letting the agent perform operations on your data without backing it up and
-> taking other relevant precautions.
+Verify that **Git** (`git --version`) and **uv** (`uv --version`) are installed
+and available in the system's `PATH`. If either tool is missing, look up the
+current installation best practices for their platform and offer to install it
+for the user.
 
-#### Ask the agent
+#### 2. Install `agentic_ecology`
 
-> Set up the environment for this project.
+Do **NOT** work directly inside a clone of this repository. Instead, keep this
+repository as a local skills toolkit and initialize your own isolated project
+directories.
 
-#### What the agent does
+Clone the repository location of the user's choice on their computer with `git
+clone https://github.com/google-deepmind/agentic_ecology.git`, then follow your
+own established practices to make the skills in `skills/` globally discoverable.
 
-The agent runs the necessary commands to set up Python and install package
-dependencies.
+#### 2. Initialize a project workspace
+
+Offer to initialize a project workspace in a directory of the user's choosing,
+and use the **`agentic-ecology-init` skill** (which you previously made globally
+available) to initialize their project for them.
 
 --------------------------------------------------------------------------------
 
@@ -144,11 +129,11 @@ that, restart the backend server, and prompt you to reload the webpage.
 
 ## 💡 Key takeaway
 
-This repository is very minimal: it contains a
-[`pyproject.toml`](pyproject.toml) configuration file declaring the Python
-dependencies the agent needs along with a handful of agent instruction files
-([`GEMINI.md`](GEMINI.md), [`.agents/AGENTS.md`](.agents/AGENTS.md)) and skills
-(stored in [`.agents/skills`](.agents/skills)), all of which are human-readable.
+This repository is very minimal: it contains reference dependency configurations
+and workspace guidelines (stored in
+[`skills/agentic-ecology-init/references`](skills/agentic-ecology-init/references))
+along with a collection of modular capability instructions (stored in
+[`skills`](skills)), all of which are human-readable.
 
 The agent instructions and skills are nothing more than a shortcut that reliably
 sends the agent in the right direction: they were themselves constructed by
@@ -168,14 +153,5 @@ don't hesitate to state your needs; to question the agent; to ask it to clarify,
 self-correct its mistakes, and amend its instructions and skills; to nudge it in
 the right direction if it starts veering down the wrong path.
 
---------------------------------------------------------------------------------
-
-## 📁 Repository Structure
-
-*   `databases/`: This is where the databases created by the agent are stored.
-*   `agent_workspace/`: This is where all files generated by the agent are
-    saved. Look here for your web app, python scripts, and HTML pages.
-*   `.agents/skills/`: Custom capability instructions (skills) that tell the
-    agent how to build databases and web apps safely and correctly.
 
 *This is not an officially supported Google product.*

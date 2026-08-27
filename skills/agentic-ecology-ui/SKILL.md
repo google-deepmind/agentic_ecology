@@ -1,5 +1,5 @@
 ---
-name: ui
+name: agentic-ecology-ui
 description: >-
   Guidelines and templates for creating a generic web UI to visualize, rank,
   filter, and annotate vector databases. The UI has a hierarchical structure

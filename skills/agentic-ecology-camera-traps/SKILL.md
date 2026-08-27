@@ -1,5 +1,5 @@
 ---
-name: camera-traps
+name: agentic-ecology-camera-traps
 description: >-
   Provides capabilities to run SpeciesNet detector and classifier on camera trap
   images, extract crop-level feature embeddings, and populate a Hoplite vector

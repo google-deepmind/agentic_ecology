@@ -1,5 +1,5 @@
 ---
-name: colab-cli
+name: agentic-ecology-colab-cli
 description: >-
   Provides guidelines and workflows for launching, managing, and executing
   workloads on remote Google Colab runtimes using the external google-colab-cli.
@@ -44,5 +44,5 @@ structures, see:
 
 > [!IMPORTANT] To comply with repository environment rules, any files you plan
 > to use, test, or modify MUST first be copied into the `agent_workspace/`
-> directory. Do not run or write them directly in `.agents/skills/...` to ensure
+> directory. Do not run or write them directly in `skills/...` to ensure
 > all executions remain inside the workspace.

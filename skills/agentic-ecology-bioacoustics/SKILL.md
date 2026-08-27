@@ -1,5 +1,5 @@
 ---
-name: bioacoustics
+name: agentic-ecology-bioacoustics
 description: >-
   Provides bioacoustic analysis capabilities for ecologists and researchers
   using the perch-hoplite Python package. A typical use case is to use agile
@@ -66,7 +66,7 @@ For detailed API usage, implementation instructions, and code examples, see the
 > [!IMPORTANT] To comply with repository environment rules, any references or
 > template code you plan to use, test, or modify MUST first be copied into the
 > `agent_workspace/` directory. Do not run or import them directly from
-> `.agents/skills/...` to ensure all executions remain inside the workspace.
+> `skills/...` to ensure all executions remain inside the workspace.
 
 This reference covers:
 
