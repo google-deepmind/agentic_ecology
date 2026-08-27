@@ -1,0 +1,24 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Ecological Modeling",
+      "description": "Skills for bioacoustics and camera trap workflows.",
+      "skills": [
+        "agentic-ecology-bioacoustics",
+        "agentic-ecology-camera-traps"
+      ]
+    },
+    {
+      "title": "Setup & Infrastructure",
+      "description": "Skills for workspace initialization, UI scaffolding, Colab compute, and storage.",
+      "skills": [
+        "agentic-ecology-init",
+        "agentic-ecology-ui",
+        "agentic-ecology-colab-cli",
+        "agentic-ecology-storage"
+      ]
+    }
+  ]
+}

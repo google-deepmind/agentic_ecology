@@ -1,6 +1,8 @@
 
 # Agentic ecology
 
+[![skills.sh](https://skills.sh/b/google-deepmind/agentic_ecology)](https://skills.sh/google-deepmind/agentic_ecology)
+
 Agentic ecology provides AI-driven tools to assist researchers and practitioners
 processing, analyzing, and annotating their data. It currently focuses on
 passive acoustic monitoring (PAM) datasets (bioacoustics), with more
@@ -29,55 +31,51 @@ Think of this project not as a tool, but as a tool-building tool.
 
 ## 🚀 Getting started
 
-To get started, open your agentic development platform and prompt your agent:
+> [!WARNING]
+>  Unless you have extensive experience with agentic software engineering, we
+>  recommend that you set up your agentic coding environment so that the agent
+>  asks your permission before performing any operation on your machine on your
+>  behalf or to interact with files outside of the workspace's root directory.
+>  Vet every command the agent intends to run on your behalf and carefully
+>  inspect the code it requests to execute, as agent mistakes can happen. Avoid
+>  letting the agent perform operations on your data without backing it up and
+>  taking other relevant precautions.
 
-> Help me get started with agentic ecology by following the README agent
-> instructions in https://github.com/google-deepmind/agentic_ecology.
+### 1. Verify and install prerequisites
 
-### A word of caution
+Verify that the following prerequisites are installed:
 
-Unless you have extensive experience with agentic software engineering, we
-recommend that you set up your agentic coding environment so that the agent asks
-your permission before performing any operation on your machine on your behalf
-or to interact with files outside of the workspace's root directory. Vet every
-command the agent intends to run on your behalf and carefully inspect the code
-it requests to execute, as agent mistakes can happen. Avoid letting the agent
-perform operations on your data without backing it up and taking other relevant
-precautions.
+* `node >=22.20.0`
+* `npx`
+* `git`
+* `uv`
 
---------------------------------------------------------------------------------
+If you need help on this, prompt your agent:
 
-### 🤖 Agent instructions
+> Check if `node >= 22.20.0`, `npx`, `git`, and `uv` are installed. For any that
+> are missing or below the required version, detect my OS and install/upgrade
+> them for me.
 
-If you are an AI agent tasked with setting up the environment, follow these
-step-by-step instructions.
+### 2. Install the `agentic-ecology-init` skill globally
 
-#### 1. Verify and install prerequisites
+Prompt your agent:
 
-Verify that **Git** (`git --version`) and **uv** (`uv --version`) are installed
-and available in the system's `PATH`. If either tool is missing, look up the
-current installation best practices for their platform and offer to install it
-for the user.
+> Use `npx skills` to install the agentic-ecology-init skill from
+> `google-deepmind/agentic_ecology` globally. Make sure it is globally
+> discoverable for you.
 
-#### 2. Install `agentic_ecology`
+Or if you are comfortable with the command-line, run:
 
-Do **NOT** work directly inside a clone of this repository. Instead, keep this
-repository as a local skills toolkit and initialize your own isolated project
-directories.
+```bash
+npx skills add google-deepmind/agentic_ecology --skill agentic-ecology-init -g
+```
 
-Clone the repository to a location of the user's choice on their computer with
-`git clone https://github.com/google-deepmind/agentic_ecology.git`, then:
-1. Follow your environment's established practices to make the skills in
-   `skills/` globally discoverable.
-2. Ensure the cloned repository directory is added to your agentic coding
-   environment's trusted/allowed paths so that reading skill runbooks and
-   reference templates does not trigger security read prompts.
+### 3. Initialize a new project directory
 
-#### 3. Initialize a project workspace
+Open your agentic development platform and prompt your agent:
 
-Offer to initialize a project workspace in a directory of the user's choosing,
-and use the **`agentic-ecology-init` skill** (which you previously made globally
-available) to initialize their project for them.
+> Use the `agentic-ecology-init` skill to initialize an agentic ecology project
+> in `<my_project_directory>`.
 
 --------------------------------------------------------------------------------
 
