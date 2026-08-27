@@ -96,10 +96,6 @@ songs.
 > is hosted here: https://zenodo.org/records/4656848/files/mp3_Files.zip.
 > Download and extract the files into data/powdermill, then help me get started.
 
-> **Note:** We are downloading MP3 files rather than WAV files to save on
-> download time. If you would rather work with WAV files, feel free to adapt the
-> URL in the prompt above.
-
 #### What the agent does
 
 The agent:
