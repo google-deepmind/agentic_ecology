@@ -63,11 +63,6 @@ Follow these sequential steps:
 For detailed API usage, implementation instructions, and code examples, see the
 `references/technical_reference.md`.
 
-> [!IMPORTANT] To comply with repository environment rules, any references or
-> template code you plan to use, test, or modify MUST first be copied into the
-> `agent_workspace/` directory. Do not run or import them directly from
-> `skills/...` to ensure all executions remain inside the workspace.
-
 This reference covers:
 
 *   Hoplite Database initialization and loading

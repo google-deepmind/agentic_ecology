@@ -39,8 +39,3 @@ Google Drive:
 For installation steps, configuration guides, and command examples, see:
 
 *   [Storage Technical Reference](references/technical_reference.md)
-
-> [!IMPORTANT] To comply with repository environment rules, any files you plan
-> to use, test, or modify MUST first be copied into the `agent_workspace/`
-> directory. Do not run or write them directly in `skills/...` to ensure
-> all executions remain inside the workspace.

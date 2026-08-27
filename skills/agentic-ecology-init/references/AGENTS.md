@@ -16,12 +16,12 @@
     Any code you run MUST be in the form of a script in the `agent_workspace`
     directory.
 *   **Adherence to Skills & Templates:** You MUST closely review and adhere to
-    the design patterns, utility functions (e.g., `sanitize_float` for JSON/JS
-    compatibility), and thread-safety patterns defined in the `skills/`
-    templates. When transitioning from mock templates to real implementations,
-    ensure all template-provided safety guards are fully preserved and applied
-    to live data flows to prevent known edge-case failures (such as NaN
-    serialization or multi-threaded SQLite connection errors).
+    the design patterns, utility functions, and thread-safety patterns defined
+    in the skill reference templates. When adapting reference templates into
+    your project workspace (e.g., `agent_workspace/`), ensure all
+    template-provided safety guards are fully preserved and applied to live data
+    flows to prevent known edge-case failures (such as NaN serialization or
+    multi-threaded SQLite connection errors).
 
 ## Technical Gotchas & Rules
 

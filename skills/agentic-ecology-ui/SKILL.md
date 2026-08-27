@@ -205,12 +205,8 @@ When creating a web interface for agent results, follow these patterns:
 
 ## Templates and Examples
 
-The skill contains generic templates meant to be copied to the agent's working
-directory and adapted:
-
-> [!IMPORTANT] To comply with repository environment rules, templates and
-> reference code MUST first be copied into the `agent_workspace/` directory
-> before they are ran, imported, or modified. Never run or edit them in-place.
+The skill contains generic templates meant to be copied to the project's
+working directory (e.g., `agent_workspace/`) and adapted:
 
 *   **Static HTML Template**: [index.html](references/index.html) — M3-compliant
     hierarchical client-side UI with design tokens, database/label selection,

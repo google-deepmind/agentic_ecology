@@ -41,8 +41,3 @@ For detailed command options, authentication modes, and script execution command
 structures, see:
 
 *   [Colab CLI Technical Reference](references/technical_reference.md)
-
-> [!IMPORTANT] To comply with repository environment rules, any files you plan
-> to use, test, or modify MUST first be copied into the `agent_workspace/`
-> directory. Do not run or write them directly in `skills/...` to ensure
-> all executions remain inside the workspace.
