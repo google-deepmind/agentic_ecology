@@ -23,9 +23,10 @@ Follow these sequential steps to set up the local workspace:
         (or retrieve its location from the user if not obvious).
 2.  **Initialize Project & Scaffolding**:
     *   Ensure the target project directory exists.
-    *   Run `uv init --python 3.12 --bare` in the project directory if it has
-        not already been initialized. This pins `.python-version` to 3.12,
-        generates `.gitignore`, and initializes version control tracking.
+    *   Run `uv init --python 3.12 --no-readme && rm main.py` in the project
+        directory if it has not already been initialized. This pins
+        `.python-version` to 3.12, generates `.gitignore`, initializes version
+        control tracking, and removes the placeholder entrypoint.
     *   Create standard working subdirectories:
         *   `agent_workspace/`: Sandboxed folder for agent scripts, server
             runners, and generated files.
@@ -33,8 +34,9 @@ Follow these sequential steps to set up the local workspace:
         *   `data/`: Destination folder for raw datasets (e.g., audio, images).
         *   `.agents/`: Configuration folder for agent skills and local rules.
 3.  **Copy Reference Dependency Configurations**:
-    *   Copy the reference `pyproject.toml` and `uv.lock` from
-        `agentic_ecology/skills/agentic-ecology-init/references/` into the target project root.
+    *   Overwrite the generated `pyproject.toml` and copy `uv.lock` from
+        `agentic_ecology/skills/agentic-ecology-init/references/` into the
+        target project root.
     *   Adjust the package name in `pyproject.toml` to match the user's project
         name if desired, keeping all core dependencies (`perch-hoplite`,
         `speciesnet`), constraints, and build configurations intact.

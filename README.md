@@ -68,7 +68,7 @@ directories.
 Clone the repository to a location of the user's choice on their computer with
 `git clone https://github.com/google-deepmind/agentic_ecology.git`, then:
 1. Follow your environment's established practices to make the skills in
-   `skills/` globally discoverable (e.g., registering them in `skills.json`).
+   `skills/` globally discoverable.
 2. Ensure the cloned repository directory is added to your agentic coding
    environment's trusted/allowed paths so that reading skill runbooks and
    reference templates does not trigger security read prompts.
