@@ -12,11 +12,10 @@
     },
     {
       "title": "Setup & Infrastructure",
-      "description": "Skills for workspace initialization, UI scaffolding, Colab compute, and storage.",
+      "description": "Skills for workspace initialization, UI scaffolding, and storage.",
       "skills": [
         "agentic-ecology-init",
         "agentic-ecology-ui",
-        "agentic-ecology-colab-cli",
         "agentic-ecology-storage"
       ]
     }

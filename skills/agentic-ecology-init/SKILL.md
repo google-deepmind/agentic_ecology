@@ -25,8 +25,9 @@ Follow these sequential steps to set up the local workspace:
         directory if it has not already been initialized. This pins
         `.python-version` to 3.12, generates `.gitignore`, initializes version
         control tracking, and removes the placeholder entrypoint.
-    *   Install the `google-deepmind/agentic_ecology` skills locally with `npx
-        skills add`.
+    *   Install the `google-deepmind/agentic_ecology` and
+        `googlecolab/google-colab-cli` (`colab-operator`) skills locally with
+        `npx skills add`.
     *   Create standard working subdirectories:
         *   `agent_workspace/`: Sandboxed folder for agent scripts, server
         *   `databases/`: Destination folder for Hoplite vector databases.
@@ -40,9 +41,9 @@ Follow these sequential steps to set up the local workspace:
 5.  **Install Workspace Rules (`AGENTS.md`)**:
     *   Copy the reference `AGENTS.md` from this skill's `references/` directory
         into the appropriate location in the project workspace to establish
-        standard Agentic Ecology safety guidelines (macOS dynamic library
-        deadlock rules, Linux PyTorch/TensorFlow import order rules, and SQL log
-        suppression filters).
+        standard Agentic Ecology guidelines (compute assessment and offloading
+        protocols, macOS dynamic library deadlock rules, Linux
+        PyTorch/TensorFlow import order rules, and SQL log suppression filters).
 6.  **Synchronize Environment with `uv`**:
     *   Execute `uv sync` from the target project root to create the local
         virtual environment (`.venv`) and install all pinned dependencies.

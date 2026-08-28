@@ -23,6 +23,40 @@
     flows to prevent known edge-case failures (such as NaN serialization or
     multi-threaded SQLite connection errors).
 
+## Compute Assessment & Execution Planning
+
+When faced with tasks requiring significant compute (e.g., generating embeddings
+across large audio/image datasets):
+
+*   **Evaluate Execution Options:** Do not unilaterally launch long-running or
+    resource-intensive jobs on the local machine without evaluation. Reflect on
+    the available options:
+    *   **Local Execution (`uv run python agent_workspace/...`):**
+        *   *Pros:* Zero remote setup or cloud dependency; no cloud compute unit
+            / quota usage; outputs and databases remain directly in the local
+            workspace.
+        *   *Cons:* Constrained by local machine hardware (often CPU-only or
+            limited memory/VRAM); can take significant wall-clock time and
+            throttle the local system.
+    *   **Remote Execution via Colab (`colab-operator` / `colab` CLI):**
+        *   *Pros:* Access to high-throughput GPU/TPU accelerators (T4, L4,
+            A100, TPU v5e/v6e); drastically reduces embedding/training
+            wall-clock time; frees local compute.
+        *   *Cons:* Consumes Google Colab compute units; requires
+            authentication, remote package setup, and dataset transfer / result
+            syncing (e.g., via Google Drive / `rclone`).
+*   **Present Recommendation & Await Decision:**
+    *   Weigh dataset volume, estimated runtime, local hardware capabilities,
+        and setup overhead.
+    *   Present the options, key trade-offs, and a recommended approach clearly
+        to the user.
+    *   Prompt the user for their preference and proceed only after the user
+        chooses how to run the job.
+*   **Execute Chosen Path:**
+    *   If **Local**: Follow local execution standards using `uv run python`.
+    *   If **Colab**: Use the `colab-operator` skill (e.g., ephemeral `colab
+        run`) and storage workflows as appropriate.
+
 ## Technical Gotchas & Rules
 
 ### 1. macOS Dynamic Library Deadlock (TensorFlow & PyArrow)

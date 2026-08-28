@@ -38,6 +38,32 @@ detector = SpeciesNetDetector(model_name)
 classifier = SpeciesNetClassifier(model_name)
 ```
 
+#### Handling Read-Only Filesystem Mounts (Colab / Kaggle Environments)
+
+*   **Issue:** When running inside an environment with pre-mounted Kaggle models
+    (such as Colab VMs or Kaggle environments where `kagglehub` resolves to
+    `/kaggle/input/`), the target directory is mounted as read-only. Because
+    model loaders (such as `SpeciesNetDetector` and `SpeciesNetClassifier`)
+    attempt to download and write additional weights or configurations into the
+    model folder, initializing them directly against `/kaggle/input/...` fails
+    with an `OSError: [Errno 30] Read-only file system`.
+*   **Workaround:** Copy the mounted model directory from `/kaggle/input/...` to
+    a local writable directory (such as `/content/speciesnet_model` on Colab or
+    `/tmp/speciesnet_model`) prior to instantiating the detector and classifier:
+
+```python
+import os
+import shutil
+
+local_model_dir = "/content/speciesnet_model"
+mounted_model_dir = "/kaggle/input/speciesnet/pytorch/v4.0.3a/1"
+if os.path.exists(mounted_model_dir) and not os.path.exists(local_model_dir):
+    shutil.copytree(mounted_model_dir, local_model_dir)
+
+detector = SpeciesNetDetector(local_model_dir)
+classifier = SpeciesNetClassifier(local_model_dir)
+```
+
 ### 3. Extracting Embeddings via PyTorch Hook
 
 Hook the squeeze layer immediately preceding the linear classification head:

@@ -27,7 +27,10 @@ Follow these sequential steps:
         feature size), the metric set to `Cos`, and the data type set to
         `float16`.
 3.  **Run Ingestion Pipeline**:
-    *   Instantiate the `SpeciesNetDetector` and `SpeciesNetClassifier` models.
+    *   Instantiate the `SpeciesNetDetector` and `SpeciesNetClassifier` models
+        (if running in an environment with pre-mounted read-only models like
+        `/kaggle/input/` on Colab, copy the model directory to a local writable
+        path first; see the technical reference).
     *   Register a PyTorch forward hook on the classifier's average pooling
         layer (`SpeciesNet/efficientnetv2-m/avg_pool/Mean_Squeeze__3825`) to
         intercept raw embeddings.
