@@ -44,7 +44,7 @@ across large audio/image datasets):
             wall-clock time; frees local compute.
         *   *Cons:* Consumes Google Colab compute units; requires
             authentication, remote package setup, and dataset transfer / result
-            syncing (e.g., via Google Drive / `rclone`).
+            syncing.
 *   **Present Recommendation & Await Decision:**
     *   Weigh dataset volume, estimated runtime, local hardware capabilities,
         and setup overhead.
@@ -56,6 +56,39 @@ across large audio/image datasets):
     *   If **Local**: Follow local execution standards using `uv run python`.
     *   If **Colab**: Use the `colab-operator` skill (e.g., ephemeral `colab
         run`) and storage workflows as appropriate.
+        *   **Files within Upload Limit (< ~70MB):** Transfer directly using
+            `colab upload`.
+        *   **Files Exceeding Upload Limit (≥ ~70MB):** `colab upload` enforces
+            a 100MB HTTP request payload limit, meaning raw files exceeding
+            ~70MB fail due to base64 encoding expansion. When transferring files
+            or datasets that exceed this threshold, do not unilaterally choose
+            a transfer strategy. Follow the evaluate/recommend/await decision
+            protocol:
+            *   **Evaluate Storage Options:**
+                *   **Chunking & Reassembly:** Split files locally (e.g.,
+                    `split -b 50M`), upload chunks via `colab upload`, and
+                    reconstruct remotely (`cat ...`).
+                    *   *Pros:* Self-contained in Colab VM; requires no
+                        Google Drive OAuth permissions or interactive mount
+                        prompts.
+                    *   *Cons:* Overhead to split and reassemble; data is
+                        ephemeral and lost if the runtime disconnects.
+                *   **Google Drive (`gws-drive-upload` + Drive Mount):** Upload
+                    to Drive via `gws-drive-upload` and mount inside Colab
+                    (`drive.mount('/content/drive')`).
+                    *   *Pros:* Robust for large multi-GB files; persistent
+                        across runtimes and sessions.
+                    *   *Cons:* Requires Google Drive OAuth permissions and
+                        session mounting steps.
+            *   **Present Storage Recommendation & Await Decision:**
+                *   Weigh dataset size, persistence requirements, and setup
+                    friction.
+                *   Present the storage options, key trade-offs, and a
+                    recommended approach clearly to the user.
+                *   Prompt the user for their preference and proceed only after
+                    the user decides how to handle file storage.
+            *   **Execute Chosen Storage Path:** Proceed with the selected
+                strategy (chunking or Google Drive upload and mount).
 
 ## Technical Gotchas & Rules
 

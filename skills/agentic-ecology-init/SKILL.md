@@ -25,11 +25,12 @@ Follow these sequential steps to set up the local workspace:
         directory if it has not already been initialized. This pins
         `.python-version` to 3.12, generates `.gitignore`, initializes version
         control tracking, and removes the placeholder entrypoint.
-    *   Install the `google-deepmind/agentic_ecology` and
-        `googlecolab/google-colab-cli` (`colab-operator`) skills locally with
-        `npx skills add`.
+    *   Install the following skills locally with `npx skills add`:
+        *    `google-deepmind/agentic_ecology` (all skills).
+        *    `googlecolab/google-colab-cli` (`colab-operator` skill).
+        *    `googleworkspace/cli` (`gws-shared` and `gws-drive-upload` skills).
     *   Create standard working subdirectories:
-        *   `agent_workspace/`: Sandboxed folder for agent scripts, server
+        *   `agent_workspace/`: Sandboxed folder for agent scripts, server.
         *   `databases/`: Destination folder for Hoplite vector databases.
         *   `data/`: Destination folder for raw datasets (e.g., audio, images).
 3.  **Copy Reference Dependency Configurations**:

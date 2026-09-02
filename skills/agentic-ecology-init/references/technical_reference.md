@@ -12,22 +12,20 @@ environment, pins Python 3.12 in `.python-version`, generates `.gitignore`
 by dynamic versioning tools and package managers) while removing the placeholder
 `main.py` entrypoint.
 
-To install `google-deepmind/agentic_ecology` and `googlecolab/google-colab-cli`
-(`colab-operator`) skills locally, execute `npx skills add
-google-deepmind/agentic_ecology -y -a <your_name>` and `npx skills add
-googlecolab/google-colab-cli --skill colab-operator -y -a <your_name>`. If you are
-unsure what value to use for `<your_name>`, list accepted values programmatically
-with `curl -s https://registry.npmjs.org/skills/latest | jq '[.keywords[] |
-select(. as $k | ["cli","agent-skills","skills","ai-agents"] | index($k) |
-not)]'`.
+Install the required skills locally using `npx skills add` with `-a <your_name>`
+as shown below. If you are unsure what value to use for `<your_name>`, list
+accepted values programmatically with `curl -s
+https://registry.npmjs.org/skills/latest | jq '[.keywords[] | select(. as $k |
+["cli","agent-skills","skills","ai-agents"] | index($k) | not)]'`.
 
 ```bash
 # Initialize uv project with Python 3.12 (if not already initialized) and remove main.py
 uv init --python 3.12 --no-readme && rm main.py
 
-# Install google-deepmind/agentic_ecology and googlecolab/google-colab-cli skills
+# Install google-deepmind/agentic_ecology, googlecolab/google-colab-cli, and googleworkspace/cli skills
 npx skills add google-deepmind/agentic_ecology -y -a <your_name>
 npx skills add googlecolab/google-colab-cli --skill colab-operator -y -a <your_name>
+npx skills add googleworkspace/cli --skill gws-shared --skill gws-drive-upload -y -a <your_name>
 
 # Scaffold required agentic ecology subdirectories
 mkdir -p agent_workspace data databases
