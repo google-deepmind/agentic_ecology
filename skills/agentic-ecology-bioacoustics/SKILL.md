@@ -16,9 +16,9 @@ compatibility: Requires Python 3.12+, uv, TensorFlow, libsndfile
 > [!CAUTION] **DATABASE SAFETY AND INTEGRITY**: Do NOT write, modify, or insert
 > test annotations directly into the user's production databases. If you need to
 > test database operations (such as saving annotations or training models), you
-> MUST copy the database to a temporary location (e.g., inside the conversation
-> scratch directory) and test against the copy. Never leave testing data in
-> production databases.
+> MUST copy the database to a temporary location in `agent_workspace` (e.g.,
+> `agent_workspace/test_db`) and test against the copy. Never leave testing data
+> in production databases.
 
 ## Workflow Overview
 
@@ -30,11 +30,45 @@ Follow these sequential steps:
         is not provided, ask the user.
     2.  **Select Embedding Model:** Confirm which embedding model to use (e.g.,
         `perch_v2`, `surfperch`). Query the user if they have not specified one.
-    3.  **Create Database:** Initialize a new Hoplite database in the
-        `databases` directory located in the repo's root directory, configured
-        with the selected model's embedding dimension.
-    4.  **Populate Database:** Extract embeddings from the recordings and
-        populate the database with them along with metadata.
+    3.  **Assess Compute Scale:** Follow the compute assessment and execution
+        planning protocol in `AGENTS.md` to evaluate options (Local vs. Colab
+        vs. GCP Dataflow) and await the user's decision.
+    4.  **Execute Ingestion Strategy:**
+        *   **Option A (Local Ingestion):** For small to medium recording batches:
+            1.  **Create Database:** Initialize a new Hoplite database in the
+                `databases` directory located in the repo's root directory,
+                configured with the selected model's embedding dimension.
+            2.  **Populate Database:** Extract embeddings from the recordings
+                using `EmbedWorker` and populate the database with them along
+                with metadata.
+        *   **Option B (Remote Ingestion via Colab):** For intermediate batches
+            benefiting from GPU/TPU acceleration:
+            1.  **Stage Audio:** Transfer recordings to the Colab environment
+                following the storage evaluation and upload protocols in
+                `AGENTS.md`.
+            2.  **Remote Ingestion:** Run `EmbedWorker` on the Colab GPU runtime
+                to generate embeddings and populate an ephemeral Hoplite
+                database.
+            3.  **Sync Database:** Download the populated database files from
+                Colab into the local `databases/` directory. Ensure the database
+                audio source metadata points to the local recordings path so the
+                local web app can resolve and stream audio.
+        *   **Option C (Cloud-Scale Ingestion via GCP Dataflow):** For large
+            recording corpora (hundreds of GBs to TBs):
+            1.  **Stage Audio to GCS:** Stage recordings to Cloud Storage
+                following the GCP storage architecture and staging protocols in
+                `AGENTS.md`.
+            2.  **Distributed Dataflow Embedding:** Execute the Apache Beam
+                pipeline ([dataflow_embed.py](assets/dataflow_embed.py)) on
+                Google Cloud Dataflow with `DataflowRunner` to extract
+                embeddings and generate sharded TFRecords.
+            3.  **Convert to Hoplite DB:** Ingest the resulting TFRecords into a
+                Hoplite database using `convert_tfrecords`.
+            4.  **Mount with GCS FUSE:** Mount the audio bucket via GCS FUSE
+                (`google-cloud-storage-fuse`) so the web app can stream audio
+                windows on demand without downloading full recordings.
+            Refer to [GCP Dataflow Audio Embedding](references/GCP_DATAFLOW_EMBEDDING.md)
+            for complete instructions and commands.
 2.  **Build a Bioacoustics Web App:** Create an interactive webpage for the user
     to browse, search, and annotate audio snippets associated with the Hoplite
     database created in the previous step. Make sure the web app supports the
@@ -66,11 +100,15 @@ Follow these sequential steps:
 For detailed API usage, implementation instructions, and code examples, see:
 
 *   [Bioacoustics Technical Reference](references/REFERENCE.md)
+*   [GCP Dataflow Audio Embedding Technical Reference](references/GCP_DATAFLOW_EMBEDDING.md)
 
 This reference covers:
 
 *   Hoplite Database initialization and loading
 *   Populating database with embeddings using `EmbedWorker`
+*   Distributed audio embedding on Google Cloud Dataflow with Apache Beam
+*   Ingesting Dataflow TFRecords with `convert_tfrecords`
+*   GCS FUSE audio streaming without breaking changes
 *   Resolving physical audio files from database records
 *   Agile Modeling setup and search implementation
 *   Serving search results via the interactive UI

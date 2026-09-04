@@ -22,10 +22,11 @@ https://registry.npmjs.org/skills/latest | jq '[.keywords[] | select(. as $k |
 # Initialize uv project with Python 3.12 (if not already initialized) and remove main.py
 uv init --python 3.12 --no-readme && rm main.py
 
-# Install google-deepmind/agentic_ecology, googlecolab/google-colab-cli, and googleworkspace/cli skills
+# Install google-deepmind/agentic_ecology, googlecolab/google-colab-cli, googleworkspace/cli, and google/skills
 npx skills add google-deepmind/agentic_ecology -y -a <your_name>
 npx skills add googlecolab/google-colab-cli --skill colab-operator -y -a <your_name>
 npx skills add googleworkspace/cli --skill gws-shared --skill gws-drive-upload -y -a <your_name>
+npx skills add google/skills --skill gcloud --skill google-cloud-storage-basics --skill google-cloud-storage-bucket-architect --skill google-cloud-storage-fuse --skill cloud-logging-query-generation -y -a <your_name>
 
 # Scaffold required agentic ecology subdirectories
 mkdir -p agent_workspace data databases
@@ -75,6 +76,7 @@ description = "Agentic tools for ecological modelling"
 requires-python = ">=3.12"
 
 dependencies = [
+    "apache-beam[gcp]",
     "perch-hoplite[tf,jax,onnx]",
     "speciesnet",
 ]

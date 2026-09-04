@@ -33,6 +33,7 @@ Follow these sequential steps to set up the local workspace:
         *    `google-deepmind/agentic_ecology` (all skills).
         *    `googlecolab/google-colab-cli` (`colab-operator` skill).
         *    `googleworkspace/cli` (`gws-shared` and `gws-drive-upload` skills).
+        *    `google/skills` (`gcloud`, `google-cloud-storage-basics`, `google-cloud-storage-bucket-architect`, `google-cloud-storage-fuse`, and `cloud-logging-query-generation` skills).
     *   Create standard working subdirectories:
         *   `agent_workspace/`: Sandboxed folder for agent scripts, server.
         *   `databases/`: Destination folder for Hoplite vector databases.

@@ -23,10 +23,29 @@ Refer to the `create_and_populate_db` function in [server.py](../assets/server.p
     containing the database files (e.g. `databases/powdermill`), not the path to
     the sqlite file itself.
 *   Favor `perch_hoplite.agile.embed.EmbedWorker(audio_sources, model_config,
-    db)` to populate the database. This high-level API automatically manages
+    db)` to populate the database locally. This high-level API automatically manages
     dataset configurations, creates deployments and recordings, processes audio
     (including optional sharding), generates embeddings, and saves essential
     metadata (`model_config` and `audio_sources`) to the database.
+*   **Remote Ingestion via Colab:** For intermediate datasets benefiting from
+    GPU/TPU acceleration, execute `EmbedWorker` remotely using the
+    `colab-operator` skill. Transfer audio according to `AGENTS.md` upload
+    thresholds, run `EmbedWorker` in the Colab session, and download the
+    populated database files to the local `databases/` directory.
+    *   **Audio Source Path Preservation:** `EmbedWorker` stores the recording
+        `base_path` in the database's `audio_sources` metadata. Ensure the
+        `AudioSourceConfig.base_path` recorded in the database reflects the
+        relative path where recordings are stored in the local workspace (e.g.
+        `data/<dataset_name>`), rather than the remote Colab path (e.g.
+        `/content/...`). If necessary, update the `audio_sources` metadata key
+        before or after downloading so that the local web application can
+        resolve and stream audio files without raising `FileNotFoundError`.
+*   **Cloud-Scale Embedding via GCP Dataflow:** For large-scale PAM recording corpora,
+    extract embeddings using the distributed Apache Beam pipeline on Google Cloud
+    Dataflow ([dataflow_embed.py](../assets/dataflow_embed.py)) and ingest the resulting
+    TFRecords into the Hoplite database using `convert_legacy.convert_tfrecords`.
+    See [GCP Dataflow Audio Embedding](GCP_DATAFLOW_EMBEDDING.md) for full instructions,
+    pipeline execution commands, and GCS FUSE audio streaming setup.
 *   **Recursive Directory Globbing Limitation:** The `file_glob` parameter of
     `AudioSourceConfig` does **not** support recursive globbing patterns such as
     `**/*.wav`.

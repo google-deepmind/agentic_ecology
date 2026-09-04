@@ -45,11 +45,21 @@ across large audio/image datasets):
         *   *Cons:* Consumes Google Colab compute units; requires
             authentication, remote package setup, and dataset transfer / result
             syncing.
+    *   **Cloud-Scale Execution via GCP Dataflow (`DataflowRunner` & Cloud Storage):**
+        *   *Pros:* Massive distributed horizontal scaling across worker pools;
+            efficiently processes large-scale corpora (hundreds of GBs to TBs of
+            PAM recordings or camera trap imagery) that exceed single-machine or
+            Colab session limits; outputs durable, sharded embeddings directly on
+            Google Cloud Storage.
+        *   *Cons:* Incurs Google Cloud infrastructure costs; requires GCP
+            project authentication, IAM permissions, and API enablement
+            (`dataflow.googleapis.com`, `storage.googleapis.com`).
 *   **Present Recommendation & Await Decision:**
     *   Weigh dataset volume, estimated runtime, local hardware capabilities,
         and setup overhead.
     *   Present the options, key trade-offs, and a recommended approach clearly
-        to the user.
+        to the user (e.g. Local for small batches, Colab for intermediate
+        accelerator needs, GCP Dataflow for massive dataset corpora).
     *   Prompt the user for their preference and proceed only after the user
         chooses how to run the job.
 *   **Execute Chosen Path:**
@@ -89,6 +99,25 @@ across large audio/image datasets):
                     the user decides how to handle file storage.
             *   **Execute Chosen Storage Path:** Proceed with the selected
                 strategy (chunking or Google Drive upload and mount).
+    *   If **GCP (Dataflow & Cloud Storage)**:
+        *   **Use Installed Google Skills:** Strictly use the official
+            `google/skills` skills (`gcloud`, `google-cloud-storage-basics`,
+            `google-cloud-storage-bucket-architect`, `google-cloud-storage-fuse`,
+            `cloud-logging-query-generation`) for all GCP operations.
+        *   **Non-Interactive Execution:** Always supply `--quiet` (or `-q`) to
+            `gcloud` commands and explicitly pass `--project=<PROJECT_ID>` and
+            regional flags (e.g., `--region=<REGION>`) to prevent interactive
+            prompts from hanging execution.
+        *   **Storage Architecture & Staging:** Use
+            `google-cloud-storage-basics` (`gcloud storage cp` or `rsync -r`)
+            for multi-threaded asset staging into standard bucket layouts
+            (`gs://<BUCKET>/audio/...`, `gs://<BUCKET>/embeddings/...`,
+            `gs://<BUCKET>/temp/`, `gs://<BUCKET>/staging/`).
+        *   **Pipeline Execution:** Launch Beam jobs with `--runner=DataflowRunner`
+            using the relevant domain skill template (e.g. `dataflow_embed.py` in
+            bioacoustics).
+        *   **Troubleshooting & Logging:** Use `cloud-logging-query-generation`
+            to inspect Dataflow worker logs and diagnose failed stages or OOMs.
 
 ## Technical Gotchas & Rules
 
