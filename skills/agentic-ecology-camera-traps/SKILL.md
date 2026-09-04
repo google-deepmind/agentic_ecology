@@ -3,7 +3,10 @@ name: agentic-ecology-camera-traps
 description: >-
   Provides capabilities to run SpeciesNet detector and classifier on camera trap
   images, extract crop-level feature embeddings, and populate a Hoplite vector
-  database for downstream search and agile modeling.
+  database for downstream search and agile modeling. Use when ingesting camera
+  trap images, classifying wildlife photos, or indexing camera trap data.
+license: Apache-2.0
+compatibility: Requires Python 3.12+, uv, PyTorch; GPU recommended for large datasets
 ---
 
 # Camera Traps Skill
@@ -30,7 +33,7 @@ Follow these sequential steps:
     *   Instantiate the `SpeciesNetDetector` and `SpeciesNetClassifier` models
         (if running in an environment with pre-mounted read-only models like
         `/kaggle/input/` on Colab, copy the model directory to a local writable
-        path first; see the technical reference).
+        path first; see the [Technical Reference](references/REFERENCE.md)).
     *   Register a PyTorch forward hook on the classifier's average pooling
         layer (`SpeciesNet/efficientnetv2-m/avg_pool/Mean_Squeeze__3825`) to
         intercept raw embeddings.
@@ -61,3 +64,10 @@ Follow these sequential steps:
         query URIs by downloading the image, running the detector to identify
         target bounding boxes, preprocessing the crop, and capturing the
         embedding vector using the PyTorch forward hook on the classifier.
+
+## Technical Reference
+
+For detailed model loading code, Kaggle/Colab read-only filesystem workarounds,
+PyTorch hook embedding extraction, and bounding box calculations, see:
+
+*   [Camera Traps Technical Reference](references/REFERENCE.md)

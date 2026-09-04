@@ -4,8 +4,10 @@ description: >-
   Guidelines and templates for creating a generic web UI to visualize, rank,
   filter, and annotate vector databases. The UI has a hierarchical structure
   covering database selection, label selection/definition, ranking/filtering
-  configuration, and row visualization/annotation. Meant to be copied and
-  adapted for specific downstream tasks like bioacoustics or camera traps.
+  configuration, and row visualization/annotation. Use when building, serving,
+  or adapting an interactive web UI for Hoplite vector databases.
+license: Apache-2.0
+compatibility: Requires Python 3.12+ and a modern web browser
 ---
 
 # UI Skill: Visualizing, Ranking, Filtering, and Annotating Vector Databases
@@ -154,7 +156,7 @@ When creating a web interface for agent results, follow these patterns:
     values, but they result in invalid JSON that crashes JavaScript parser
     engines (`JSON.parse`) in the browser.
     *   **Pattern**: Sanitize all float values using the `sanitize_float` helper
-        function in [server.py](references/server.py) before returning them in
+        function in [server.py](assets/server.py) before returning them in
         JSON API responses.
 
 ### 11. Material Design 3 (M3) Visual Conformance
@@ -208,9 +210,9 @@ When creating a web interface for agent results, follow these patterns:
 The skill contains generic templates meant to be copied to the project's
 working directory (e.g., `agent_workspace/`) and adapted:
 
-*   **Static HTML Template**: [index.html](references/index.html) — M3-compliant
+*   **Static HTML Template**: [index.html](assets/index.html) — M3-compliant
     hierarchical client-side UI with design tokens, database/label selection,
     paging, annotation, and inline snackbar notifications.
-*   **Custom Python Server**: [server.py](references/server.py) — API server
+*   **Custom Python Server**: [server.py](assets/server.py) — API server
     exposing endpoints to list databases, retrieve rows, train classifiers, and
     save annotations.

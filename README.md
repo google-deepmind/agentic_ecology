@@ -129,7 +129,7 @@ that, restart the backend server, and prompt you to reload the webpage.
 
 This repository is very minimal: it contains reference dependency configurations
 and workspace guidelines (stored in
-[`skills/agentic-ecology-init/references`](skills/agentic-ecology-init/references))
+[`skills/agentic-ecology-init/assets`](skills/agentic-ecology-init/assets))
 along with a collection of modular capability instructions (stored in
 [`skills`](skills)), all of which are human-readable.
 

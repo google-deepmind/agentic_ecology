@@ -5,7 +5,10 @@ description: >-
   using the perch-hoplite Python package. A typical use case is to use agile
   modeling to bootstrap the creation and deployment of a bespoke detector for
   targeted species on an existing collection of passive acoustic monitoring
-  recordings.
+  recordings. Use when processing and annotating audio recordings for
+  bioacoustic applications.
+license: Apache-2.0
+compatibility: Requires Python 3.12+, uv, TensorFlow, libsndfile
 ---
 
 # Bioacoustics Skill
@@ -60,8 +63,9 @@ Follow these sequential steps:
 
 ## Technical Reference
 
-For detailed API usage, implementation instructions, and code examples, see the
-`references/technical_reference.md`.
+For detailed API usage, implementation instructions, and code examples, see:
+
+*   [Bioacoustics Technical Reference](references/REFERENCE.md)
 
 This reference covers:
 

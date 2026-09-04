@@ -1,9 +1,13 @@
 ---
 name: agentic-ecology-init
 description: >-
-  Initializes a local uv-managed project directory for agentic ecology workloads.
-  Sets up Python dependencies using reference pyproject.toml and uv.lock, configures
-  workspace rules, and ensures Agentic Ecology skills are discoverable.
+  Initializes a local uv-managed project directory for agentic ecology
+  workloads. Sets up Python dependencies using reference pyproject.toml and
+  uv.lock, configures workspace rules, and ensures Agentic Ecology skills are
+  discoverable. Use when initializing a new project workspace or bootstrapping a
+  clean environment.
+license: Apache-2.0
+compatibility: Requires Python 3.12+, uv, and network access
 ---
 
 # Agentic Ecology Project Initialization Skill
@@ -35,12 +39,12 @@ Follow these sequential steps to set up the local workspace:
         *   `data/`: Destination folder for raw datasets (e.g., audio, images).
 3.  **Copy Reference Dependency Configurations**:
     *   Overwrite the generated `pyproject.toml` and copy `uv.lock` from
-        this skill's `references/` directory into the target project root.
+        this skill's `assets/` directory into the target project root.
     *   Adjust the package name in `pyproject.toml` to match the user's project
         name if desired, keeping all core dependencies (`perch-hoplite`,
         `speciesnet`), constraints, and build configurations intact.
 5.  **Install Workspace Rules (`AGENTS.md`)**:
-    *   Copy the reference `AGENTS.md` from this skill's `references/` directory
+    *   Copy the reference `AGENTS.md` from this skill's `assets/` directory
         into the appropriate location in the project workspace to establish
         standard Agentic Ecology guidelines (compute assessment and offloading
         protocols, macOS dynamic library deadlock rules, Linux
@@ -49,13 +53,13 @@ Follow these sequential steps to set up the local workspace:
     *   Execute `uv sync` from the target project root to create the local
         virtual environment (`.venv`) and install all pinned dependencies.
 7.  **Verify Environment Setup**:
-    *   Run a verification command via `uv run python` to confirm that key
-        libraries (`perch_hoplite`, `speciesnet`, `soundfile`, `tensorflow`)
-        import cleanly.
+    *   Execute the verification script `scripts/verify_env.py` via `uv run
+        python` to confirm that key libraries (`perch_hoplite`, `speciesnet`,
+        `soundfile`, `tensorflow`) import cleanly.
 
 ## Technical Reference
 
 For detailed command options, directory layout specifications, and verification
 code snippets, see:
 
-*   [Initialization Technical Reference](references/technical_reference.md)
+*   [Initialization Technical Reference](references/REFERENCE.md)

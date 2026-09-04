@@ -15,7 +15,7 @@ using the `perch-hoplite` Python package.
 
 ### Creating and Populating the Hoplite Database
 
-Refer to the `create_and_populate_db` function in [server.py](server.py).
+Refer to the `create_and_populate_db` function in [server.py](../assets/server.py).
 
 *   Favor `perch_hoplite.db.sqlite_usearch_impl.SQLiteUSearchDB.create(db_path)`
     to connect to an existing database, as it automatically loads the
@@ -55,9 +55,9 @@ When querying the database, you will interact with the following key datatypes
     *   `name`: `str`.
     *   `project`: `str`.
 *   **Database Metadata**: Refer to the `inspect_database` function in
-    [server.py](server.py). Extract model config, key (e.g.
+    [server.py](../assets/server.py). Extract model config, key (e.g.
     `taxonomy_model_tf`), and database window counts.
-*   **Database Adapter**: Refer to [server.py](server.py) for converting
+*   **Database Adapter**: Refer to [server.py](../assets/server.py) for converting
     hierarchical database structures into the flat JSON representation expected
     by the frontend UI.
 
@@ -91,7 +91,7 @@ Follow the best practices laid out in this repository's `agentic-ecology-ui` ski
 
 #### SQLite Concurrency & Thread-Splitting
 
-Refer to the `_get_db` implementation in [server.py](server.py).
+Refer to the `_get_db` implementation in [server.py](../assets/server.py).
 
 SQLite connections are bound to individual threads and cannot be shared. In a
 multi-threaded Python server (e.g., using `socketserver.ThreadingTCPServer`),
