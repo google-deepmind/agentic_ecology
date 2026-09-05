@@ -28,13 +28,14 @@ worker nodes.
 ```
 
 The workflow consists of five stages:
-1. **Prerequisites & GCP Setup**: Authenticate and configure Google Cloud tools.
-2. **Bucket Provisioning & Audio Staging**: Organize and sync audio to Cloud Storage.
-3. **Dataflow Embedding Pipeline**: Run the distributed Apache Beam pipeline.
-4. **Hoplite Database Conversion**: Ingest output TFRecords into a queryable Hoplite DB.
-5. **Web App Audio Streaming with GCS FUSE**: Mount the GCS bucket to stream audio slices directly in the web UI.
 
----
+1. **Prerequisites & GCP Setup**: Authenticate and configure Google Cloud tools.
+1. **Bucket Provisioning & Audio Staging**: Organize and sync audio to Cloud Storage.
+1. **Dataflow Embedding Pipeline**: Run the distributed Apache Beam pipeline.
+1. **Hoplite Database Conversion**: Ingest output TFRecords into a queryable Hoplite DB.
+1. **Web App Audio Streaming with GCS FUSE**: Mount the GCS bucket to stream audio slices directly in the web UI.
+
+______________________________________________________________________
 
 ## 1. Prerequisites & GCP Setup
 
@@ -80,7 +81,7 @@ gcloud services enable \
   --project=<PROJECT_ID> --quiet
 ```
 
----
+______________________________________________________________________
 
 ## 2. Bucket Architecture & Audio Staging
 
@@ -120,7 +121,7 @@ gcloud storage rsync -r ./data/<DATASET_NAME> gs://<BUCKET_NAME>/audio/<DATASET_
   --project=<PROJECT_ID> --quiet
 ```
 
----
+______________________________________________________________________
 
 ## 3. Dataflow Embedding Pipeline
 
@@ -128,6 +129,7 @@ The reusable pipeline script is located at:
 `skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py`
 
 ### Pipeline Capabilities
+
 - **Model Preset Selection**: Uses `perch_hoplite.zoo.model_configs` to instantiate
   embedding models (e.g., `perch_v2`, `surfperch`).
 - **Distributed Inference**: Workers load model weights once during `setup()`,
@@ -175,7 +177,7 @@ uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
 > (`libsndfile1`, TensorFlow), build and supply a container image using
 > `--sdk_container_image=<IMAGE_URI>` hosted on Google Artifact Registry.
 
----
+______________________________________________________________________
 
 ## 4. Monitoring & Troubleshooting
 
@@ -205,7 +207,7 @@ gcloud logging read \
   --quiet
 ```
 
----
+______________________________________________________________________
 
 ## 5. Ingesting Cloud Embeddings into Hoplite
 
@@ -236,10 +238,11 @@ print(f"Hoplite database created successfully at {db_path}")
 ```
 
 This populates:
+
 - The USearch index with window embedding vectors.
 - SQLite tables with `Window`, `Recording`, `Deployment`, and `model_config` metadata.
 
----
+______________________________________________________________________
 
 ## 6. Audio Streaming with GCS FUSE
 
@@ -248,17 +251,19 @@ the entire audio corpus locally, mount the GCS bucket using **GCS FUSE**
 (`google/skills@google-cloud-storage-fuse`).
 
 ### Why GCS FUSE Preserves the Streaming Paradigm
+
 In the Bioacoustics Web App (`server.py`), audio playback requests (`/stream`)
 invoke `_read_audio_window(db, window_id)`. `soundfile` opens the file path and seeks
 directly to the window offsets.
 
 When the bucket is mounted via GCS FUSE:
+
 1. The GCS bucket appears as a local filesystem directory.
-2. When `soundfile` seeks and reads the 5-second slice, GCS FUSE issues **HTTP range requests**
+1. When `soundfile` seeks and reads the 5-second slice, GCS FUSE issues **HTTP range requests**
    under the hood to fetch only that specific chunk of audio from Google Cloud Storage.
-3. The server converts this 5-second chunk to WAV bytes in-memory and streams it to
+1. The server converts this 5-second chunk to WAV bytes in-memory and streams it to
    the user's browser.
-4. **No large audio files are ever downloaded in full**, completely preserving the
+1. **No large audio files are ever downloaded in full**, completely preserving the
    existing low-latency streaming paradigm with zero modifications to `server.py`.
 
 ### Mounting the GCS Bucket

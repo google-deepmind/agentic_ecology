@@ -5,8 +5,7 @@ initializing a local `uv`-managed agentic ecology workspace.
 
 ## Project Initialization & Directory Structure
 
-To initialize a new project workspace, execute `uv init --python 3.12
---no-readme && rm main.py` in the root directory. This bootstraps the project
+To initialize a new project workspace, execute `uv init --python 3.12 --no-readme && rm main.py` in the root directory. This bootstraps the project
 environment, pins Python 3.12 in `.python-version`, generates `.gitignore`
 (ignoring `.venv`), and initializes version control tracking (which is required
 by dynamic versioning tools and package managers) while removing the placeholder
@@ -14,9 +13,7 @@ by dynamic versioning tools and package managers) while removing the placeholder
 
 Install the required skills locally using `npx skills add` with `-a <your_name>`
 as shown below. If you are unsure what value to use for `<your_name>`, list
-accepted values programmatically with `curl -s
-https://registry.npmjs.org/skills/latest | jq '[.keywords[] | select(. as $k |
-["cli","agent-skills","skills","ai-agents"] | index($k) | not)]'`.
+accepted values programmatically with `curl -s https://registry.npmjs.org/skills/latest | jq '[.keywords[] | select(. as $k | ["cli","agent-skills","skills","ai-agents"] | index($k) | not)]'`.
 
 ```bash
 # Initialize uv project with Python 3.12 (if not already initialized) and remove main.py
@@ -45,7 +42,7 @@ my_ecology_project/
 └── uv.lock                   # Pinned dependency lockfile
 ```
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## Dependency Configuration (`pyproject.toml` and `uv.lock`)
 
@@ -92,7 +89,7 @@ constraint-dependencies = [
 perch-hoplite = { git = "https://github.com/google-research/perch-hoplite.git" }
 ```
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## Workspace Guidelines (`AGENTS.md`)
 
@@ -102,7 +99,7 @@ preserve essential workspace rules (such as compute assessment and offloading
 protocols, macOS TensorFlow/PyArrow deadlock prevention, Linux
 PyTorch/TensorFlow import order, and SQL log suppression filters).
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 5. Synchronizing the Environment
 
@@ -113,13 +110,12 @@ dependencies:
 uv sync
 ```
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 6. Verifying the Setup
 
 Copy the reference verification script [verify_env.py](../scripts/verify_env.py) from this
-skill's `scripts/` directory into `agent_workspace/` and execute it via `uv
-run python` to confirm that all core libraries are available and import safely
+skill's `scripts/` directory into `agent_workspace/` and execute it via `uv run python` to confirm that all core libraries are available and import safely
 without deadlocks:
 
 ```bash

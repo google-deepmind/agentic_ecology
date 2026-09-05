@@ -40,16 +40,16 @@ classifier = SpeciesNetClassifier(model_name)
 
 #### Handling Read-Only Filesystem Mounts (Colab / Kaggle Environments)
 
-*   **Issue:** When running inside an environment with pre-mounted Kaggle models
-    (such as Colab VMs or Kaggle environments where `kagglehub` resolves to
-    `/kaggle/input/`), the target directory is mounted as read-only. Because
-    model loaders (such as `SpeciesNetDetector` and `SpeciesNetClassifier`)
-    attempt to download and write additional weights or configurations into the
-    model folder, initializing them directly against `/kaggle/input/...` fails
-    with an `OSError: [Errno 30] Read-only file system`.
-*   **Workaround:** Copy the mounted model directory from `/kaggle/input/...` to
-    a local writable directory (such as `/content/speciesnet_model` on Colab or
-    `/tmp/speciesnet_model`) prior to instantiating the detector and classifier:
+- **Issue:** When running inside an environment with pre-mounted Kaggle models
+  (such as Colab VMs or Kaggle environments where `kagglehub` resolves to
+  `/kaggle/input/`), the target directory is mounted as read-only. Because
+  model loaders (such as `SpeciesNetDetector` and `SpeciesNetClassifier`)
+  attempt to download and write additional weights or configurations into the
+  model folder, initializing them directly against `/kaggle/input/...` fails
+  with an `OSError: [Errno 30] Read-only file system`.
+- **Workaround:** Copy the mounted model directory from `/kaggle/input/...` to
+  a local writable directory (such as `/content/speciesnet_model` on Colab or
+  `/tmp/speciesnet_model`) prior to instantiating the detector and classifier:
 
 ```python
 import os
@@ -94,8 +94,7 @@ if captured_embeddings:
 
 ### 4. Crop Bounding Box Calculations
 
-MegaDetector returns normalized relative coordinates: `[xmin, ymin, width,
-height]`. Convert them to absolute pixel coordinates for PIL cropping:
+MegaDetector returns normalized relative coordinates: `[xmin, ymin, width, height]`. Convert them to absolute pixel coordinates for PIL cropping:
 
 ```python
 left = int(bbox[0] * img.width)
@@ -136,14 +135,14 @@ When the user enters a custom query URI (such as an external HTTP/S image URL or
 a local file path) instead of an existing database window ID, you must extract
 its embedding on-the-fly:
 
-1.  **Resolve and Load Image**: Download the image (for HTTP/S URLs) using
-    `urllib.request` or load it from disk, and convert it to RGB format.
-2.  **Detect Bounding Box**: Run the preloaded `SpeciesNetDetector` model on the
-    image. If detections are found, extract the highest-confidence bounding box.
-3.  **Crop and Classify**: Pass the image and the bounding box to
-    `SpeciesNetClassifier.preprocess(img, bboxes=[bbox_obj])`.
-4.  **Hook Embedding**: Intercept the average pooling layer of the classifier
-    during prediction using the forward hook to extract the 1280-dimensional
-    feature vector, cast it to `float16`, and run the USearch similarity search.
-5.  **Caching**: Cache both the query preview image and the extracted embedding
-    to prevent duplicate downloads and model inference passes on page refreshes.
+1. **Resolve and Load Image**: Download the image (for HTTP/S URLs) using
+   `urllib.request` or load it from disk, and convert it to RGB format.
+1. **Detect Bounding Box**: Run the preloaded `SpeciesNetDetector` model on the
+   image. If detections are found, extract the highest-confidence bounding box.
+1. **Crop and Classify**: Pass the image and the bounding box to
+   `SpeciesNetClassifier.preprocess(img, bboxes=[bbox_obj])`.
+1. **Hook Embedding**: Intercept the average pooling layer of the classifier
+   during prediction using the forward hook to extract the 1280-dimensional
+   feature vector, cast it to `float16`, and run the USearch similarity search.
+1. **Caching**: Cache both the query preview image and the extracted embedding
+   to prevent duplicate downloads and model inference passes on page refreshes.
