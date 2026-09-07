@@ -151,15 +151,33 @@ uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
   --dry_run
 ```
 
+### Building the Dataflow Worker Container
+
+Dataflow workers require system audio decoding libraries (`libsndfile1`) and ML packages
+(`tensorflow`, `perch-hoplite`). Build and push the worker image to Google Artifact Registry
+using Google Cloud Build:
+
+```bash
+# Build and push the worker image via Cloud Build with BuildKit
+gcloud builds submit \
+  --config=skills/agentic-ecology-bioacoustics/assets/cloudbuild.yaml \
+  --substitutions=_IMAGE_TAG="<REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/perch-worker:latest" \
+  --project="<PROJECT_ID>" \
+  --quiet \
+  skills/agentic-ecology-bioacoustics/assets/
+```
+
 ### Submitting to Google Cloud Dataflow
 
-Submit the distributed job to Dataflow with `DataflowRunner`:
+Submit the distributed job to Dataflow with `DataflowRunner` pointing to the pre-built worker image.
+Note: Use single-level wildcards (such as `*/*.wav`) because `etils.epath` on Cloud Storage does not
+support recursive `**` patterns:
 
 ```bash
 uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
-  --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/**/*.wav" \
+  --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/*/*.wav" \
   --output_dir="gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>" \
-  --model_key="perch_v2" \
+  --model_key="perch_v2_cpu" \
   --window_size_s=5.0 \
   --hop_size_s=5.0 \
   --runner="DataflowRunner" \
@@ -169,13 +187,8 @@ uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
   --staging_location="gs://<BUCKET_NAME>/staging" \
   --machine_type="n1-standard-4" \
   --max_num_workers=32 \
-  --save_main_session=True
+  --sdk_container_image="<REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/perch-worker:latest"
 ```
-
-> [!TIP]
-> For production worker environments requiring pre-built system dependencies
-> (`libsndfile1`, TensorFlow), build and supply a container image using
-> `--sdk_container_image=<IMAGE_URI>` hosted on Google Artifact Registry.
 
 ______________________________________________________________________
 

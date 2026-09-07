@@ -1,0 +1,10 @@
+steps:
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    args:
+      - '--dockerfile=Dockerfile'
+      - '--destination=$_IMAGE_TAG'
+      - '--cache=true'
+substitutions:
+  _IMAGE_TAG: 'us-central1-docker.pkg.dev/kakapo-345218/birb/perch-worker:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY

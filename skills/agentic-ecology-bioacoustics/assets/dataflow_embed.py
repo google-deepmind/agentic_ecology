@@ -21,6 +21,8 @@ models and serialize the results into sharded TFRecords compatible with Perch
 Hoplite database conversion (`convert_legacy.convert_tfrecords`).
 """
 
+import tensorflow as tf
+
 import argparse
 import dataclasses
 import json
@@ -42,31 +44,21 @@ from perch_hoplite import audio_io
 from perch_hoplite.zoo import model_configs
 from perch_hoplite.zoo import zoo_interface
 import soundfile
-import tensorflow as tf
-
-
-@dataclasses.dataclass
-class SourceInfo:
-  """Source information for an audio file."""
-
-  filepath: str
-  shard_num: int = 0
-  shard_len_s: float = -1.0
-
-  def file_id(self, file_id_depth: int) -> str:
-    """Extracts a relative file ID based on directory depth."""
-    parts = epath.Path(self.filepath).parts
-    depth = min(file_id_depth + 1, len(parts))
-    return epath.Path(*parts[-depth:]).as_posix()
 
 
 def create_source_infos(
     source_file_patterns: Sequence[str],
     shard_len_s: float = -1.0,
-) -> list[SourceInfo]:
-  """Expands file glob patterns into a list of SourceInfo objects."""
+) -> list[dict[str, Any]]:
+  """Expands file glob patterns into a list of source info dictionaries."""
   source_files = []
   for pattern in source_file_patterns:
+    if "**" in pattern:
+      raise ValueError(
+          f"Recursive wildcard '**' in pattern '{pattern}' is not supported by "
+          "etils.epath on Cloud Storage. Use single-level wildcards such as '*/*.wav' instead."
+      )
+
     if "://" in pattern:
       scheme, rest = pattern.split("://", 1)
       root = f"{scheme}://"
@@ -83,7 +75,7 @@ def create_source_infos(
   for sf in source_files:
     path_str = sf.as_posix()
     if shard_len_s <= 0:
-      source_infos.append(SourceInfo(filepath=path_str, shard_num=0, shard_len_s=-1.0))
+      source_infos.append({"filepath": path_str, "shard_num": 0, "shard_len_s": -1.0})
     else:
       try:
         with sf.open("rb") as f:
@@ -92,11 +84,11 @@ def create_source_infos(
         num_shards = max(1, int(np.ceil(duration_s / shard_len_s)))
         for i in range(num_shards):
           source_infos.append(
-              SourceInfo(filepath=path_str, shard_num=i, shard_len_s=shard_len_s)
+              {"filepath": path_str, "shard_num": i, "shard_len_s": shard_len_s}
           )
       except Exception as exc:  # pylint: disable=broad-exception-caught
         logging.warning("Could not read audio file header for %s: %s. Using single shard.", path_str, exc)
-        source_infos.append(SourceInfo(filepath=path_str, shard_num=0, shard_len_s=-1.0))
+        source_infos.append({"filepath": path_str, "shard_num": 0, "shard_len_s": -1.0})
 
   return source_infos
 
@@ -133,19 +125,26 @@ class EmbedFn(beam.DoFn):
     if self.target_sample_rate == -2:
       self.target_sample_rate = self.embedding_model.sample_rate
 
-  def process(self, source_info: SourceInfo) -> Iterable[tf.train.Example]:
+  def process(self, source_info: dict[str, Any]) -> Iterable[tf.train.Example]:
     """Processes a single source audio file or shard."""
     if self.embedding_model is None:
       self.setup()
 
-    file_id = source_info.file_id(self.file_id_depth)
+    filepath = source_info["filepath"]
+    shard_num = source_info.get("shard_num", 0)
+    shard_len_s = source_info.get("shard_len_s", -1.0)
+
+    parts = epath.Path(filepath).parts
+    depth = min(self.file_id_depth + 1, len(parts))
+    file_id = epath.Path(*parts[-depth:]).as_posix()
+
     try:
       audio_data = audio_io.load_audio(
-          source_info.filepath,
+          filepath,
           target_sample_rate=self.target_sample_rate,
       )
     except Exception as exc:  # pylint: disable=broad-exception-caught
-      logging.warning("Failed to load audio for %s: %s", source_info.filepath, exc)
+      logging.warning("Failed to load audio for %s: %s", filepath, exc)
       return
 
     if audio_data is None or len(audio_data) < int(self.min_audio_s * self.target_sample_rate):
@@ -158,11 +157,11 @@ class EmbedFn(beam.DoFn):
     hop_samples = int(self.hop_size_s * self.target_sample_rate)
 
     start_sample = 0
-    if source_info.shard_len_s > 0:
-      start_sample = int(source_info.shard_num * source_info.shard_len_s * self.target_sample_rate)
+    if shard_len_s > 0:
+      start_sample = int(shard_num * shard_len_s * self.target_sample_rate)
       end_sample = min(
           len(audio_data),
-          int((source_info.shard_num + 1) * source_info.shard_len_s * self.target_sample_rate),
+          int((shard_num + 1) * shard_len_s * self.target_sample_rate),
       )
       audio_data = audio_data[start_sample:end_sample]
 
@@ -301,7 +300,7 @@ def run_pipeline(argv: Sequence[str] | None = None) -> None:
   source_patterns = [p.strip() for p in known_args.input_glob.split(",") if p.strip()]
   output_dir = epath.Path(known_args.output_dir)
 
-  preset_cfg = model_configs.get_model_config(known_args.model_key)
+  preset_cfg = model_configs.get_preset_model_config(known_args.model_key)
   model_config_dict = dict(preset_cfg.model_config)
   model_config_dict["window_size_s"] = known_args.window_size_s
   model_config_dict["hop_size_s"] = known_args.hop_size_s
@@ -318,7 +317,7 @@ def run_pipeline(argv: Sequence[str] | None = None) -> None:
     logging.info("Starting dry-run test...")
     sample = source_infos[0]
     embed_fn = EmbedFn(
-        model_key=known_args.model_key,
+        model_key=preset_cfg.model_key,
         model_config=model_config_dict,
         file_id_depth=known_args.file_id_depth,
         min_audio_s=known_args.min_audio_s,
@@ -329,7 +328,7 @@ def run_pipeline(argv: Sequence[str] | None = None) -> None:
     results = list(embed_fn.process(sample))
     logging.info(
         "Dry run succeeded! Processed sample %s, generated %d TFExamples.",
-        sample.filepath,
+        sample["filepath"],
         len(results),
     )
     return
@@ -338,7 +337,7 @@ def run_pipeline(argv: Sequence[str] | None = None) -> None:
   write_metadata_config(
       output_dir=output_dir,
       source_file_patterns=source_patterns,
-      model_key=known_args.model_key,
+      model_key=preset_cfg.model_key,
       model_config=model_config_dict,
       file_id_depth=known_args.file_id_depth,
       min_audio_s=known_args.min_audio_s,
@@ -349,7 +348,7 @@ def run_pipeline(argv: Sequence[str] | None = None) -> None:
   pipeline_options.view_as(SetupOptions).save_main_session = True
 
   embed_fn = EmbedFn(
-      model_key=known_args.model_key,
+      model_key=preset_cfg.model_key,
       model_config=model_config_dict,
       file_id_depth=known_args.file_id_depth,
       min_audio_s=known_args.min_audio_s,
