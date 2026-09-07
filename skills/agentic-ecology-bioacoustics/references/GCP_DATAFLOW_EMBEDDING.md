@@ -228,26 +228,46 @@ Once the Dataflow job finishes, the output directory (`gs://<BUCKET_NAME>/embedd
 contains `config.json` and sharded `embeddings-*.tfrec` files.
 
 Use `perch_hoplite.agile.migrations.convert_legacy.convert_tfrecords` to ingest these
-embeddings into a queryable Hoplite database:
+embeddings into a queryable Hoplite database, and configure `audio_sources` metadata
+so the database points to your audio recordings directory (local or GCS FUSE mount):
 
 ```python
 import pathlib
+from perch_hoplite.agile import source_info
 from perch_hoplite.agile.migrations import convert_legacy
 
 # Path to the GCS embeddings directory (or locally synced directory)
 embeddings_path = "gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>"
 db_path = "databases/<DATASET_NAME>"
 dataset_name = "<DATASET_NAME>"
+# Set base_path to local recordings (data/<DATASET_NAME>) or GCS FUSE mount (data/gcs_mount/audio/<DATASET_NAME>)
+audio_base_path = "data/<DATASET_NAME>"
 
 # Ingest TFRecords and construct Hoplite SQLite/USearch database
-convert_legacy.convert_tfrecords(
+db = convert_legacy.convert_tfrecords(
     embeddings_path=embeddings_path,
     db_type="sqlite_usearch",
     dataset_name=dataset_name,
     db_path=db_path,
 )
 
-print(f"Hoplite database created successfully at {db_path}")
+# Update audio_sources metadata so the web app resolves physical audio files
+audio_sources = source_info.AudioSources(
+    audio_globs=(
+        source_info.AudioSourceConfig(
+            dataset_name=dataset_name,
+            base_path=audio_base_path,
+            file_glob="*/*.wav",
+            min_audio_len_s=1.0,
+            target_sample_rate_hz=-2,
+            shard_len_s=None,
+        ),
+    )
+)
+db.insert_metadata("audio_sources", audio_sources.to_config_dict())
+db.commit()
+
+print(f"Hoplite database created and configured successfully at {db_path}")
 ```
 
 This populates:
