@@ -21,6 +21,9 @@ models and serialize the results into sharded Apache Parquet files for downstrea
 ingestion into Perch Hoplite databases (`ingest_embeddings.py`).
 """
 
+# Prevent dynamic library deadlock by importing tensorflow first on macOS
+import tensorflow as tf  # noqa: F401 # isort: skip
+
 import argparse
 import json
 import logging

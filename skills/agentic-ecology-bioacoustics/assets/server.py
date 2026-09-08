@@ -25,7 +25,7 @@ reference `server` module implementation.
 # pylint: disable=undefined-variable
 
 # Prevent dynamic library deadlock by importing tensorflow first on macOS
-import tensorflow as tf  # pylint: disable=unused-import,g-bad-import-order
+import tensorflow as tf  # noqa: F401 # isort: skip # pylint: disable=unused-import,g-bad-import-order
 
 
 import collections

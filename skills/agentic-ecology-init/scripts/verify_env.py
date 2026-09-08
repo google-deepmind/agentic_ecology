@@ -20,7 +20,7 @@ import sys
 
 # Rule 1: Always import TensorFlow first on macOS to avoid dynamic library deadlock
 # with PyArrow / Abseil symbols.
-import tensorflow as tf
+import tensorflow as tf  # isort: skip
 
 
 # Rule 2: Suppress internal perch-hoplite SQL trace logs

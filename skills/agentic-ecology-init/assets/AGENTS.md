@@ -127,8 +127,11 @@ On macOS, both `tensorflow` and `pyarrow` (Apache Arrow) statically link Abseil
 if `pyarrow` is loaded first, `tensorflow` will bind to incompatible Abseil
 symbols, causing a compiler deadlock.
 
-- **Rule**: Always force `import tensorflow as tf` at the absolute top of any
-  Python script or entry point that uses JAX or TensorFlow.
+- **Rule**: Always force `import tensorflow as tf  # noqa: F401 # isort: skip`
+  at the absolute top of any Python script or entry point that uses JAX or
+  TensorFlow. Adding `# noqa: F401 # isort: skip` prevents linters and
+  auto-formatters (such as Ruff or isort) from stripping or reordering the
+  import.
 - **Rule**: Ensure this import precedes any imports of `perch_hoplite`,
   `pandas`, `gcsfs`, `fsspec`, or packages that transitively load `pyarrow`.
 
