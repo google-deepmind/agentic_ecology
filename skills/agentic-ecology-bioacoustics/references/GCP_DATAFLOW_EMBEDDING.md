@@ -142,18 +142,29 @@ The reusable pipeline script is located at:
   sizes, and file patterns directly inside the Parquet schema metadata footer, eliminating
   the need for separate sidecar configuration files.
 
-### Dry-Run Validation (Local)
+### Local Ingestion via DirectRunner
 
-Before submitting a large distributed job to Dataflow, validate your configuration
-and model instantiation locally using `DirectRunner` with the `--dry_run` flag:
+For local processing without GCP dependencies, execute `dataflow_embed.py` using `--runner=DirectRunner`:
 
 ```bash
 uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
-  --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/*/*.wav" \
-  --output_dir="scratch/dry_run_embeddings" \
+  --input_glob="data/<DATASET_NAME>/*/*.wav" \
+  --output_dir="agent_workspace/embeddings/<DATASET_NAME>" \
+  --output_format="parquet" \
   --model_key="perch_v2_cpu" \
-  --dry_run
+  --runner="DirectRunner"
 ```
+
+Then ingest the resulting Parquet embeddings into the Hoplite database:
+
+```bash
+uv run python skills/agentic-ecology-bioacoustics/assets/ingest_embeddings.py \
+  --embeddings_dir="agent_workspace/embeddings/<DATASET_NAME>" \
+  --db_path="databases/<DATASET_NAME>" \
+  --audio_dir="data/<DATASET_NAME>"
+```
+
+To validate pipeline configuration, audio pattern matching, and model instantiation without extracting full embeddings, add the `--dry_run` flag.
 
 ### Building the Dataflow Worker Container
 

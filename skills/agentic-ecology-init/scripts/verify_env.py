@@ -22,12 +22,14 @@ import sys
 # with PyArrow / Abseil symbols.
 import tensorflow as tf
 
+
 # Rule 2: Suppress internal perch-hoplite SQL trace logs
 class SQLSuppressFilter(logging.Filter):
-  """Filter to suppress excessive SQL trace logs from perch-hoplite."""
+    """Filter to suppress excessive SQL trace logs from perch-hoplite."""
 
-  def filter(self, record: logging.LogRecord) -> bool:
-    return "Executed SQL statement" not in record.getMessage()
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "Executed SQL statement" not in record.getMessage()
+
 
 logging.getLogger("absl").addFilter(SQLSuppressFilter())
 
@@ -38,13 +40,13 @@ import speciesnet
 
 
 def main() -> None:
-  print("✓ All agentic ecology packages loaded successfully.")
-  print(f"  Python executable: {sys.executable}")
-  print(f"  Perch Hoplite: {getattr(perch_hoplite, '__version__', 'available')}")
-  print(f"  SoundFile version: {soundfile.__version__}")
-  print(f"  SpeciesNet: {getattr(speciesnet, '__version__', 'available')}")
-  print(f"  TensorFlow version: {tf.__version__}")
+    print("✓ All agentic ecology packages loaded successfully.")
+    print(f"  Python executable: {sys.executable}")
+    print(f"  Perch Hoplite: {getattr(perch_hoplite, '__version__', 'available')}")
+    print(f"  SoundFile version: {soundfile.__version__}")
+    print(f"  SpeciesNet: {getattr(speciesnet, '__version__', 'available')}")
+    print(f"  TensorFlow version: {tf.__version__}")
 
 
 if __name__ == "__main__":
-  main()
+    main()

@@ -15,39 +15,39 @@ using the `perch-hoplite` Python package.
 
 ### Creating and Populating the Hoplite Database
 
-Refer to the `create_and_populate_db` function in [server.py](../assets/server.py).
+> [!IMPORTANT] **Mandatory Pipeline**: Always use [`dataflow_embed.py`](../assets/dataflow_embed.py) to extract audio embeddings into sharded Apache Parquet files, followed by [`ingest_embeddings.py`](../assets/ingest_embeddings.py) to build and populate the Hoplite database. Do NOT use `EmbedWorker` directly.
 
+- **Two-Step Ingestion Workflow**:
+  1. **Step 1: Extract Embeddings (`dataflow_embed.py`)**: Run the Apache Beam pipeline to slice audio into uniform windows, extract embeddings with the chosen model, and write self-describing Parquet shards.
+     - **Local Execution (`DirectRunner`)**:
+       ```bash
+       uv run python <path_to>/dataflow_embed.py \
+         --input_glob="data/<dataset>/*/*.wav" \
+         --output_dir="agent_workspace/embeddings/<dataset>" \
+         --output_format="parquet" \
+         --model_key="<model_key>" \
+         --runner="DirectRunner"
+       ```
+     - **Remote Execution via Colab (`DirectRunner` with GPU)**:
+       Transfer audio according to `AGENTS.md` thresholds, run `dataflow_embed.py` with `--runner=DirectRunner` on Colab's GPU runtime, and run `ingest_embeddings.py`.
+     - **Cloud-Scale Execution via GCP Dataflow (`DataflowRunner`)**:
+       See [GCP Dataflow Audio Embedding](GCP_DATAFLOW_EMBEDDING.md) for full instructions, pipeline execution commands, and GCS FUSE audio streaming setup.
+  1. **Step 2: Ingest Parquet into Hoplite DB (`ingest_embeddings.py`)**:
+     ```bash
+     uv run python <path_to>/ingest_embeddings.py \
+       --embeddings_dir="agent_workspace/embeddings/<dataset>" \
+       --db_path="databases/<dataset>" \
+       --audio_dir="data/<dataset>"
+     ```
+     This reads the Parquet shards, creates the SQLite tables and USearch vector index, records audio source and model metadata, infers deployment hierarchy, and imports agile metadata CSVs (`hoplite_*.csv` annotations, deployment metadata, and recording metadata if present in `--audio_dir` or `--metadata_dir`).
 - Favor `perch_hoplite.db.sqlite_usearch_impl.SQLiteUSearchDB.create(db_path)`
   to connect to an existing database, as it automatically loads the
   configuration from the database. Note that `db_path` must be the directory
   containing the database files (e.g. `databases/powdermill`), not the path to
   the sqlite file itself.
-- Favor `perch_hoplite.agile.embed.EmbedWorker(audio_sources, model_config, db)` to populate the database locally. This high-level API automatically manages
-  dataset configurations, creates deployments and recordings, processes audio
-  (including optional sharding), generates embeddings, and saves essential
-  metadata (`model_config` and `audio_sources`) to the database.
-- **Remote Ingestion via Colab:** For intermediate datasets benefiting from
-  GPU/TPU acceleration, execute `EmbedWorker` remotely using the
-  `colab-operator` skill. Transfer audio according to `AGENTS.md` upload
-  thresholds, run `EmbedWorker` in the Colab session, and download the
-  populated database files to the local `databases/` directory.
-  - **Audio Source Path Preservation:** `EmbedWorker` stores the recording
-    `base_path` in the database's `audio_sources` metadata. Ensure the
-    `AudioSourceConfig.base_path` recorded in the database reflects the
-    relative path where recordings are stored in the local workspace (e.g.
-    `data/<dataset_name>`), rather than the remote Colab path (e.g.
-    `/content/...`). If necessary, update the `audio_sources` metadata key
-    before or after downloading so that the local web application can
-    resolve and stream audio files without raising `FileNotFoundError`.
-- **Cloud-Scale Embedding via GCP Dataflow:** For large-scale PAM recording corpora,
-  extract embeddings using the distributed Apache Beam pipeline on Google Cloud
-  Dataflow ([dataflow_embed.py](../assets/dataflow_embed.py)) and ingest the resulting
-  Apache Parquet files into the Hoplite database using [ingest_embeddings.py](../assets/ingest_embeddings.py).
-  See [GCP Dataflow Audio Embedding](GCP_DATAFLOW_EMBEDDING.md) for full instructions,
-  pipeline execution commands, and GCS FUSE audio streaming setup.
-- **Recursive Directory Globbing Limitation:** The `file_glob` parameter of
-  `AudioSourceConfig` does **not** support recursive globbing patterns such as
-  `**/*.wav`.
+- **Wildcard Syntax Limitation:** `dataflow_embed.py` uses `etils.epath` and does
+  **not** support recursive globbing patterns such as `**/*.wav`. Use single-level
+  wildcards (e.g., `"data/<dataset>/*/*.wav"`) or pass multiple patterns.
 - Unless the user provides an explicit instruction to the contrary, use
   `min_audio_len_s=1.0` and `target_sample_rate_hz=-2` (i.e., the model's
   target sample rate).

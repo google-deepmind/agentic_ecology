@@ -15,13 +15,15 @@ a `float16` scalar kind and the `Cos` metric.
 from ml_collections import config_dict
 from perch_hoplite.db import sqlite_usearch_impl
 
-usearch_cfg = config_dict.ConfigDict({
-    "embedding_dim": 1280,
-    "metric_name": "Cos",
-    "expansion_add": 16,
-    "expansion_search": 16,
-    "dtype": "float16" # Crucial: perch-hoplite only supports float16 in USEARCH_DTYPES
-})
+usearch_cfg = config_dict.ConfigDict(
+    {
+        "embedding_dim": 1280,
+        "metric_name": "Cos",
+        "expansion_add": 16,
+        "expansion_search": 16,
+        "dtype": "float16",  # Crucial: perch-hoplite only supports float16 in USEARCH_DTYPES
+    }
+)
 db = sqlite_usearch_impl.SQLiteUSearchDB.create("databases/kga_hoplite", usearch_cfg)
 ```
 
@@ -77,8 +79,11 @@ target_layer = modules_dict["SpeciesNet/efficientnetv2-m/avg_pool/Mean_Squeeze__
 
 # Define hook callback
 captured_embeddings = []
+
+
 def hook_fn(module, input_tensor, output_tensor):
     captured_embeddings.append(output_tensor.cpu().numpy().squeeze())
+
 
 # Register hook
 hook_handle = target_layer.register_forward_hook(hook_fn)
@@ -115,17 +120,20 @@ deployment_id = db.insert_deployment(name="KGA_S1", project="KGA")
 
 # For each image:
 recording_id = db.insert_recording(
-    filename=rel_path,
-    datetime=None,
-    deployment_id=deployment_id
+    filename=rel_path, datetime=None, deployment_id=deployment_id
 )
 
 # For each detection:
 db.insert_window(
     recording_id=recording_id,
-    offsets=[bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]], # Store relative bounding box coordinates
+    offsets=[
+        bbox[0],
+        bbox[1],
+        bbox[0] + bbox[2],
+        bbox[1] + bbox[3],
+    ],  # Store relative bounding box coordinates
     embedding=embedding_vector,
-    handle_duplicates="allow"
+    handle_duplicates="allow",
 )
 ```
 

@@ -31,7 +31,7 @@ import soundfile
 import tqdm
 from etils import epath
 from ml_collections import config_dict
-from perch_hoplite.agile import embed, source_info
+from perch_hoplite.agile import embed, metadata, source_info
 from perch_hoplite.db import db_loader, sqlite_usearch_impl
 
 
@@ -83,12 +83,13 @@ def ingest_embeddings(
     embeddings_path: str,
     db_path: str,
     audio_base_path: str,
+    metadata_dir: str | None = None,
     dataset_name: str | None = None,
     batch_size: int = 1024,
     clean: bool = True,
     validate: bool = True,
 ) -> sqlite_usearch_impl.SQLiteUSearchDB:
-    """Converts Parquet embeddings into a Hoplite DB and configures audio paths."""
+    """Converts Parquet embeddings into a Hoplite DB and configures audio paths and metadata."""
     emb_dir = epath.Path(embeddings_path)
     dest_db_path = pathlib.Path(db_path)
 
@@ -140,6 +141,33 @@ def ingest_embeddings(
     # Initialize Hoplite SQLite/USearch database
     db = db_loader.create_new_usearch_db(str(dest_db_path), emb_dim)
 
+    # Load agile metadata if present
+    agile_meta_dir = epath.Path(metadata_dir or audio_base_path)
+    agile_md = metadata.AgileMetadata.from_directory(agile_meta_dir)
+
+    # Register any extra schema fields from hoplite_metadata_description.csv
+    builtin_cols = {
+        "deployments": {"id", "name", "project", "latitude", "longitude", "deployment"},
+        "recordings": {"id", "filename", "datetime", "deployment_id", "recording"},
+    }
+    dtype_map = {"str": str, "float": float, "int": int, "bytes": bytes}
+    for field in agile_md.fields.values():
+        table_name = (
+            "deployments" if field.metadata_level == "deployment" else "recordings"
+        )
+        if field.field_name in builtin_cols.get(table_name, set()):
+            continue
+        col_type = dtype_map.get(field.dtype, str)
+        try:
+            db.add_extra_table_column(table_name, field.field_name, col_type)
+        except Exception as exc:
+            logging.debug(
+                "Could not add extra column %s to %s: %s",
+                field.field_name,
+                table_name,
+                exc,
+            )
+
     # Configure and insert metadata
     audio_sources = source_info.AudioSources(
         audio_globs=(
@@ -164,8 +192,23 @@ def ingest_embeddings(
     )
     db.insert_metadata("model_config", model_config.to_config_dict())
 
-    deployment_id = db.insert_deployment(name=dataset_name, project=dataset_name)
+    deployment_id_map: dict[str, int] = {}
     recording_id_map: dict[str, int] = {}
+
+    def get_or_insert_deployment(deployment_name: str) -> int:
+        if deployment_name in deployment_id_map:
+            return deployment_id_map[deployment_name]
+        depl_kwargs = agile_md.get_deployment_metadata(deployment_name)
+        depl_kwargs.pop("deployment", None)
+        known_cols = db._extra_table_columns.get("deployments", {})
+        filtered_kwargs = {
+            k: v for k, v in depl_kwargs.items() if v is not None or k in known_cols
+        }
+        deployment_id = db.insert_deployment(
+            name=deployment_name, project=dataset_name, **filtered_kwargs
+        )
+        deployment_id_map[deployment_name] = deployment_id
+        return deployment_id
 
     total_windows = 0
     logging.info("Populating Hoplite database...")
@@ -177,7 +220,21 @@ def ingest_embeddings(
             if f_id in recording_id_map:
                 rec_id = recording_id_map[f_id]
             else:
-                rec_id = db.insert_recording(filename=f_id, deployment_id=deployment_id)
+                # Infer deployment name from file hierarchy (matching EmbedWorker)
+                depl_name = f_id.split("/")[0] if "/" in f_id else dataset_name
+                depl_id = get_or_insert_deployment(depl_name)
+
+                rec_kwargs = agile_md.get_recording_metadata(f_id)
+                rec_kwargs.pop("recording", None)
+                known_rec_cols = db._extra_table_columns.get("recordings", {})
+                filtered_rec_kwargs = {
+                    k: v
+                    for k, v in rec_kwargs.items()
+                    if v is not None or k in known_rec_cols
+                }
+                rec_id = db.insert_recording(
+                    filename=f_id, deployment_id=depl_id, **filtered_rec_kwargs
+                )
                 recording_id_map[f_id] = rec_id
             windows_batch.append(
                 {
@@ -192,6 +249,26 @@ def ingest_embeddings(
     process_batch(*first_batch)
     for batch in tqdm.tqdm(batch_gen, desc="Ingesting batches"):
         process_batch(*batch)
+
+    # Import annotations if present in agile metadata
+    if agile_md.annotations:
+        logging.info("Importing agile annotations...")
+        num_annotations = 0
+        for f_id, annotations in agile_md.annotations.items():
+            if f_id not in recording_id_map:
+                continue
+            rec_id = recording_id_map[f_id]
+            for ann in annotations:
+                db.insert_annotation(
+                    recording_id=rec_id,
+                    offsets=ann.offsets,
+                    label=ann.label,
+                    label_type=ann.label_type,
+                    provenance=ann.provenance or "agile_metadata",
+                    handle_duplicates="allow",
+                )
+                num_annotations += 1
+        logging.info("Successfully imported %d annotations.", num_annotations)
 
     db.commit()
     num_embeddings = db.count_embeddings()
@@ -218,12 +295,15 @@ def _validate_database(
     num_recordings = cursor.fetchone()[0]
     cursor.execute("SELECT COUNT(*) FROM windows")
     num_windows = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM annotations")
+    num_annotations = cursor.fetchone()[0]
     total_embeddings = db.count_embeddings()
 
     logging.info("--- Database Summary ---")
     logging.info("Deployments : %d", num_deployments)
     logging.info("Recordings  : %d", num_recordings)
     logging.info("Windows     : %d", num_windows)
+    logging.info("Annotations : %d", num_annotations)
     logging.info("Embeddings  : %d", total_embeddings)
 
     # Validate audio slice retrieval
@@ -263,6 +343,8 @@ def main():
     )
     parser.add_argument(
         "--embeddings_path",
+        "--embeddings_dir",
+        dest="embeddings_path",
         type=str,
         required=True,
         help="Directory containing sharded .parquet embeddings.",
@@ -275,9 +357,17 @@ def main():
     )
     parser.add_argument(
         "--audio_base_path",
+        "--audio_dir",
+        dest="audio_base_path",
         type=str,
         required=True,
         help="Base path to audio recordings directory (e.g. data/powdermill).",
+    )
+    parser.add_argument(
+        "--metadata_dir",
+        type=str,
+        default=None,
+        help="Directory containing agile metadata CSV files (defaults to audio_base_path).",
     )
     parser.add_argument(
         "--dataset_name",
@@ -302,6 +392,7 @@ def main():
         embeddings_path=args.embeddings_path,
         db_path=args.db_path,
         audio_base_path=args.audio_base_path,
+        metadata_dir=args.metadata_dir,
         dataset_name=args.dataset_name,
         batch_size=args.batch_size,
         clean=not args.no_clean,

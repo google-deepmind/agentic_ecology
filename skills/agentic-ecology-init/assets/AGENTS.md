@@ -34,7 +34,7 @@ across large audio/image datasets):
   - **Local Execution (`uv run python agent_workspace/...`):**
     - *Pros:* Zero remote setup or cloud dependency; no cloud compute unit
       / quota usage; outputs and databases remain directly in the local
-      workspace.
+      workspace. In bioacoustics, executes `dataflow_embed.py` with `--runner=DirectRunner`.
     - *Cons:* Constrained by local machine hardware (often CPU-only or
       limited memory/VRAM); can take significant wall-clock time and
       throttle the local system.
@@ -63,7 +63,7 @@ across large audio/image datasets):
   - Prompt the user for their preference and proceed only after the user
     chooses how to run the job.
 - **Execute Chosen Path:**
-  - If **Local**: Follow local execution standards using `uv run python`.
+  - If **Local**: Follow local execution standards using `uv run python`. In bioacoustics, always run `dataflow_embed.py` with `--runner=DirectRunner` followed by `ingest_embeddings.py`.
   - If **Colab**: Use the `colab-operator` skill (e.g., ephemeral `colab run`) and storage workflows as appropriate.
     - **Files within Upload Limit (< ~70MB):** Transfer directly using
       `colab upload`.
@@ -149,8 +149,12 @@ clogging logs.
 
   ```python
   import logging
+
+
   class SQLSuppressFilter(logging.Filter):
-    def filter(self, record):
-      return "Executed SQL statement" not in record.getMessage()
+      def filter(self, record):
+          return "Executed SQL statement" not in record.getMessage()
+
+
   logging.getLogger("absl").addFilter(SQLSuppressFilter())
   ```

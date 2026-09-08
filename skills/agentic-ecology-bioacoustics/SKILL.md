@@ -34,23 +34,21 @@ Follow these sequential steps:
       planning protocol in `AGENTS.md` to evaluate options (Local vs. Colab
       vs. GCP Dataflow) and await the user's decision.
    1. **Execute Ingestion Strategy:**
-      - **Option A (Local Ingestion):** For small to medium recording batches:
-        1. **Create Database:** Initialize a new Hoplite database in the
-           `databases` directory located in the repo's root directory,
-           configured with the selected model's embedding dimension.
-        1. **Populate Database:** Extract embeddings from the recordings
-           using `EmbedWorker` and populate the database with them along
-           with metadata.
+      > [!IMPORTANT] **MANDATORY INGESTION PIPELINE**: Always use [`dataflow_embed.py`](assets/dataflow_embed.py) to extract audio embeddings into sharded Apache Parquet files, followed by [`ingest_embeddings.py`](assets/ingest_embeddings.py) to build the Hoplite database. Do NOT use `EmbedWorker` directly.
+      - **Option A (Local Ingestion via DirectRunner):** For local execution on the local machine:
+        1. **Extract Embeddings with DirectRunner:** Execute the Apache Beam pipeline ([dataflow_embed.py](assets/dataflow_embed.py)) with `--runner=DirectRunner`, passing local audio paths for `--input_glob` and a local workspace directory (e.g., `agent_workspace/embeddings/<dataset>`) for `--output_dir`.
+        1. **Convert to Hoplite DB:** Ingest the resulting Parquet embeddings into a Hoplite database in `databases/<dataset>` using [ingest_embeddings.py](assets/ingest_embeddings.py).
       - **Option B (Remote Ingestion via Colab):** For intermediate batches
         benefiting from GPU/TPU acceleration:
         1. **Stage Audio:** Transfer recordings to the Colab environment
            following the storage evaluation and upload protocols in
            `AGENTS.md`.
-        1. **Remote Ingestion:** Run `EmbedWorker` on the Colab GPU runtime
-           to generate embeddings and populate an ephemeral Hoplite
-           database.
-        1. **Sync Database:** Download the populated database files from
-           Colab into the local `databases/` directory. Ensure the database
+        1. **Remote Embedding with DirectRunner:** Run [dataflow_embed.py](assets/dataflow_embed.py)
+           with `--runner=DirectRunner` on the Colab GPU/TPU runtime to generate
+           sharded Apache Parquet embeddings.
+        1. **Convert to Hoplite DB:** Ingest the Parquet embeddings into an ephemeral
+           Hoplite database using [ingest_embeddings.py](assets/ingest_embeddings.py)
+           and sync the database files into the local `databases/` directory. Ensure the database
            audio source metadata points to the local recordings path so the
            local web app can resolve and stream audio.
       - **Option C (Cloud-Scale Ingestion via GCP Dataflow):** For large
@@ -60,9 +58,8 @@ Follow these sequential steps:
            `AGENTS.md`.
         1. **Distributed Dataflow Embedding:** Execute the Apache Beam
            pipeline ([dataflow_embed.py](assets/dataflow_embed.py)) on
-           Google Cloud Dataflow with `DataflowRunner` (or locally with
-           `DirectRunner`) to extract embeddings and generate sharded
-           Apache Parquet files.
+           Google Cloud Dataflow with `DataflowRunner` to extract embeddings and generate sharded
+           Apache Parquet files on GCS.
         1. **Convert to Hoplite DB:** Ingest the resulting Parquet embeddings
            into a Hoplite database using [ingest_embeddings.py](assets/ingest_embeddings.py).
         1. **Mount with GCS FUSE:** Mount the audio bucket via GCS FUSE
@@ -106,7 +103,8 @@ For detailed API usage, implementation instructions, and code examples, see:
 This reference covers:
 
 - Hoplite Database initialization and loading
-- Populating database with embeddings using `EmbedWorker`
+- Audio embedding extraction via `dataflow_embed.py` (with `DirectRunner` locally or `DataflowRunner` on GCP)
+- Ingesting Parquet embeddings into Hoplite DB using `ingest_embeddings.py`
 - Distributed audio embedding on Google Cloud Dataflow with Apache Beam
 - Ingesting Dataflow embeddings with `ingest_embeddings.py`
 - GCS FUSE audio streaming without breaking changes
