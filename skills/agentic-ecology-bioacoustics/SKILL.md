@@ -60,10 +60,11 @@ Follow these sequential steps:
            `AGENTS.md`.
         1. **Distributed Dataflow Embedding:** Execute the Apache Beam
            pipeline ([dataflow_embed.py](assets/dataflow_embed.py)) on
-           Google Cloud Dataflow with `DataflowRunner` to extract
-           embeddings and generate sharded TFRecords.
-        1. **Convert to Hoplite DB:** Ingest the resulting TFRecords into a
-           Hoplite database using `convert_tfrecords`.
+           Google Cloud Dataflow with `DataflowRunner` (or locally with
+           `DirectRunner`) to extract embeddings and generate sharded
+           Apache Parquet files.
+        1. **Convert to Hoplite DB:** Ingest the resulting Parquet embeddings
+           into a Hoplite database using [ingest_embeddings.py](assets/ingest_embeddings.py).
         1. **Mount with GCS FUSE:** Mount the audio bucket via GCS FUSE
            (`google-cloud-storage-fuse`) so the web app can stream audio
            windows on demand without downloading full recordings.
@@ -107,7 +108,7 @@ This reference covers:
 - Hoplite Database initialization and loading
 - Populating database with embeddings using `EmbedWorker`
 - Distributed audio embedding on Google Cloud Dataflow with Apache Beam
-- Ingesting Dataflow TFRecords with `convert_tfrecords`
+- Ingesting Dataflow embeddings with `ingest_embeddings.py`
 - GCS FUSE audio streaming without breaking changes
 - Resolving physical audio files from database records
 - Agile Modeling setup and search implementation

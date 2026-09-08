@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir \
     ml-collections==0.1.1 \
     etils[epath]==1.14.0 \
     kagglehub==0.3.13 \
+    pyarrow \
     "git+https://github.com/google-research/perch-hoplite.git"
 
 # Pre-download and cache model weights into image

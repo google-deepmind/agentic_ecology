@@ -8,6 +8,8 @@ dependencies = [
     "apache-beam[gcp]",
     "perch-hoplite[tf,jax,onnx]",
     "pip",
+    "pyarrow",
+    "soundfile",
     "speciesnet",
 ]
 

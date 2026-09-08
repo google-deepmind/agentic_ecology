@@ -42,7 +42,7 @@ Refer to the `create_and_populate_db` function in [server.py](../assets/server.p
 - **Cloud-Scale Embedding via GCP Dataflow:** For large-scale PAM recording corpora,
   extract embeddings using the distributed Apache Beam pipeline on Google Cloud
   Dataflow ([dataflow_embed.py](../assets/dataflow_embed.py)) and ingest the resulting
-  TFRecords into the Hoplite database using `convert_legacy.convert_tfrecords`.
+  Apache Parquet files into the Hoplite database using [ingest_embeddings.py](../assets/ingest_embeddings.py).
   See [GCP Dataflow Audio Embedding](GCP_DATAFLOW_EMBEDDING.md) for full instructions,
   pipeline execution commands, and GCS FUSE audio streaming setup.
 - **Recursive Directory Globbing Limitation:** The `file_glob` parameter of

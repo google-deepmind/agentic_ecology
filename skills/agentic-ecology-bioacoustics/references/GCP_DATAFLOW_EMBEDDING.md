@@ -22,7 +22,7 @@ worker nodes.
                                                                               ▼
 ┌────────────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
 │ Bioacoustics Web App   │      │ GCS FUSE Local Mount    │      │ Perch Hoplite Database  │
-│ (Active Learning / UI) │ <─── │ Range-request streaming │ <─── │ convert_tfrecords       │
+│ (Active Learning / UI) │ <─── │ Range-request streaming │ <─── │ ingest_embeddings.py    │
 │ server.py              │      │ (zero file rewrites)    │      │ databases/<DATASET>/    │
 └────────────────────────┘      └─────────────────────────┘      └─────────────────────────┘
 ```
@@ -32,7 +32,7 @@ The workflow consists of five stages:
 1. **Prerequisites & GCP Setup**: Authenticate and configure Google Cloud tools.
 1. **Bucket Provisioning & Audio Staging**: Organize and sync audio to Cloud Storage.
 1. **Dataflow Embedding Pipeline**: Run the distributed Apache Beam pipeline.
-1. **Hoplite Database Conversion**: Ingest output TFRecords into a queryable Hoplite DB.
+1. **Hoplite Database Conversion**: Ingest output Parquet embeddings into a queryable Hoplite DB.
 1. **Web App Audio Streaming with GCS FUSE**: Mount the GCS bucket to stream audio slices directly in the web UI.
 
 ______________________________________________________________________
@@ -106,7 +106,7 @@ Structure your Cloud Storage bucket using the following directory layout:
 ```text
 gs://<BUCKET_NAME>/
 ├── audio/<DATASET_NAME>/          # Raw recording files (.wav, .flac)
-├── embeddings/<DATASET_NAME>/     # Sharded TFRecords and config.json output
+├── embeddings/<DATASET_NAME>/     # Sharded Parquet files (*.parquet)
 ├── staging/                       # Dataflow pipeline binary staging
 └── temp/                          # Dataflow temporary files during job execution
 ```
@@ -130,13 +130,17 @@ The reusable pipeline script is located at:
 
 ### Pipeline Capabilities
 
+- **Multi-Runner Support**: Executes with `--runner=DirectRunner` for local CPU testing
+  or GPU acceleration in Colab, or `--runner=DataflowRunner` for distributed horizontal
+  scaling across Google Cloud Dataflow worker pools.
 - **Model Preset Selection**: Uses `perch_hoplite.zoo.model_configs` to instantiate
-  embedding models (e.g., `perch_v2`, `surfperch`).
+  embedding models (e.g., `perch_v2_cpu`, `perch_v2`, `surfperch`).
 - **Distributed Inference**: Workers load model weights once during `setup()`,
-  slice audio files into uniform windows (e.g. 5.0s with 5.0s hop), compute embeddings
-  and logits, and emit serialized `tf.train.Example` protos.
-- **Hoplite Compatibility**: Automatically generates `config.json` alongside sharded
-  TFRecords (`embeddings-*.tfrec`), enabling direct ingestion via `convert_tfrecords`.
+  slice audio files into uniform windows (e.g. 5.0s with 5.0s hop), compute embeddings,
+  and write sharded Apache Parquet files (`embeddings-*.parquet`).
+- **Self-Describing Metadata**: Automatically embeds model parameters, hop/window
+  sizes, and file patterns directly inside the Parquet schema metadata footer, eliminating
+  the need for separate sidecar configuration files.
 
 ### Dry-Run Validation (Local)
 
@@ -145,20 +149,20 @@ and model instantiation locally using `DirectRunner` with the `--dry_run` flag:
 
 ```bash
 uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
-  --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/*.wav" \
+  --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/*/*.wav" \
   --output_dir="scratch/dry_run_embeddings" \
-  --model_key="perch_v2" \
+  --model_key="perch_v2_cpu" \
   --dry_run
 ```
 
 ### Building the Dataflow Worker Container
 
-Dataflow workers require system audio decoding libraries (`libsndfile1`) and ML packages
-(`tensorflow`, `perch-hoplite`). Build and push the worker image to Google Artifact Registry
-using Google Cloud Build:
+Dataflow workers require system audio decoding libraries (`libsndfile1`), ML packages
+(`tensorflow`, `perch-hoplite`, `pyarrow`), and pre-cached model weights. Build and push
+the worker image to Google Artifact Registry using Google Cloud Build with Kaniko:
 
 ```bash
-# Build and push the worker image via Cloud Build with BuildKit
+# Build and push the worker image via Cloud Build with Kaniko
 gcloud builds submit \
   --config=skills/agentic-ecology-bioacoustics/assets/cloudbuild.yaml \
   --substitutions=_IMAGE_TAG="<REGION>-docker.pkg.dev/<PROJECT_ID>/<REPOSITORY>/perch-worker:latest" \
@@ -177,6 +181,7 @@ support recursive `**` patterns:
 uv run python skills/agentic-ecology-bioacoustics/assets/dataflow_embed.py \
   --input_glob="gs://<BUCKET_NAME>/audio/<DATASET_NAME>/*/*.wav" \
   --output_dir="gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>" \
+  --output_format="parquet" \
   --model_key="perch_v2_cpu" \
   --window_size_s=5.0 \
   --hop_size_s=5.0 \
@@ -225,50 +230,28 @@ ______________________________________________________________________
 ## 5. Ingesting Cloud Embeddings into Hoplite
 
 Once the Dataflow job finishes, the output directory (`gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>`)
-contains `config.json` and sharded `embeddings-*.tfrec` files.
+contains self-describing sharded `embeddings-*.parquet` files.
 
-Use `perch_hoplite.agile.migrations.convert_legacy.convert_tfrecords` to ingest these
-embeddings into a queryable Hoplite database, and configure `audio_sources` metadata
-so the database points to your audio recordings directory (local or GCS FUSE mount):
+Use the turnkey ingestion script ([`ingest_embeddings.py`](../assets/ingest_embeddings.py)) to
+construct the queryable Hoplite database (SQLite metadata + USearch vector index), automatically
+rebind the audio path, and run validation sanity checks:
 
-```python
-import pathlib
-from perch_hoplite.agile import source_info
-from perch_hoplite.agile.migrations import convert_legacy
-
-# Path to the GCS embeddings directory (or locally synced directory)
-embeddings_path = "gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>"
-db_path = "databases/<DATASET_NAME>"
-dataset_name = "<DATASET_NAME>"
-# Set base_path to local recordings (data/<DATASET_NAME>) or GCS FUSE mount (data/gcs_mount/audio/<DATASET_NAME>)
-audio_base_path = "data/<DATASET_NAME>"
-
-# Ingest TFRecords and construct Hoplite SQLite/USearch database
-db = convert_legacy.convert_tfrecords(
-    embeddings_path=embeddings_path,
-    db_type="sqlite_usearch",
-    dataset_name=dataset_name,
-    db_path=db_path,
-)
-
-# Update audio_sources metadata so the web app resolves physical audio files
-audio_sources = source_info.AudioSources(
-    audio_globs=(
-        source_info.AudioSourceConfig(
-            dataset_name=dataset_name,
-            base_path=audio_base_path,
-            file_glob="*/*.wav",
-            min_audio_len_s=1.0,
-            target_sample_rate_hz=-2,
-            shard_len_s=None,
-        ),
-    )
-)
-db.insert_metadata("audio_sources", audio_sources.to_config_dict())
-db.commit()
-
-print(f"Hoplite database created and configured successfully at {db_path}")
+```bash
+uv run python skills/agentic-ecology-bioacoustics/assets/ingest_embeddings.py \
+  --embeddings_path="gs://<BUCKET_NAME>/embeddings/<DATASET_NAME>" \
+  --db_path="databases/<DATASET_NAME>" \
+  --audio_base_path="data/<DATASET_NAME>"
 ```
+
+> [!NOTE]
+> If streaming audio via GCS FUSE without downloading files locally, set `--audio_base_path="data/gcs_mount/audio/<DATASET_NAME>"`.
+
+The ingestion script:
+
+1. Lazily reads sharded Parquet batches using `pyarrow.dataset` (with zero TensorFlow dependencies).
+1. Initializes the Hoplite database with the matching embedding dimension (e.g. 1536).
+1. Rebinds `audio_sources` metadata to `--audio_base_path` so the Web App never encounters `FileNotFoundError`.
+1. Validates audio slice reading via `soundfile` and runs a test vector search query against the USearch index.
 
 This populates:
 
