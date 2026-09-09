@@ -97,7 +97,8 @@ Copy the reference [AGENTS.md](../assets/AGENTS.md) from this skill's `assets/`
 directory into the appropriate location in the target project workspace to
 preserve essential workspace rules (such as compute assessment and offloading
 protocols, macOS TensorFlow/PyArrow deadlock prevention, Linux
-PyTorch/TensorFlow import order, and SQL log suppression filters).
+PyTorch/TensorFlow import order, SQL log suppression filters, and rules prohibiting
+Google copyright headers on generated workspace code).
 
 ______________________________________________________________________
 

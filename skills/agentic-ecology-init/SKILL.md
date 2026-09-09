@@ -49,7 +49,8 @@ Follow these sequential steps to set up the local workspace:
      into the appropriate location in the project workspace to establish
      standard Agentic Ecology guidelines (compute assessment and offloading
      protocols, macOS dynamic library deadlock rules, Linux
-     PyTorch/TensorFlow import order rules, and SQL log suppression filters).
+     PyTorch/TensorFlow import order rules, SQL log suppression filters, and
+     rules prohibiting Google copyright headers on generated workspace code).
 1. **Synchronize Environment with `uv`**:
    - Execute `uv sync` from the target project root to create the local
      virtual environment (`.venv`) and install all pinned dependencies.

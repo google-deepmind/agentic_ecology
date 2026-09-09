@@ -21,7 +21,14 @@
   your project workspace (e.g., `agent_workspace/`), ensure all
   template-provided safety guards are fully preserved and applied to live data
   flows to prevent known edge-case failures (such as NaN serialization or
-  multi-threaded SQLite connection errors).
+  multi-threaded SQLite connection errors). Do NOT copy over Google copyright
+  headers or Apache 2.0 license boilerplate from reference template assets.
+- **Copyright & License Headers in Generated Code:** Do NOT add Google
+  copyright headers (`# Copyright ... Google LLC`) or Apache 2.0 license
+  boilerplate to files generated in `agent_workspace/` or elsewhere in the
+  project workspace. Code generated for or by the user belongs to the user or
+  project, not Google LLC. Keep generated scripts clean without copyright
+  or license boilerplate headers unless the user explicitly requests them.
 
 ## Compute Assessment & Execution Planning
 
