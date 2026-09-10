@@ -45,6 +45,8 @@ Follow these sequential steps:
        classifier to extract the 1280-dim embedding vector.
      - Cast the vector to `float16` and insert it into the database as a
        window.
+   - Commit database changes periodically and at the end of ingestion via
+     `db.commit()` to persist SQLite rows and flush the USearch vector index to disk.
 1. **Agile Modeling and Search**:
    - Once populated, use the Hoplite database to perform vector searches
      (ranking by similarity) or train active learning classifiers on top of

@@ -1,4 +1,3 @@
-
 # Agentic ecology
 
 [![skills.sh](https://skills.sh/b/google-deepmind/agentic_ecology)](https://skills.sh/google-deepmind/agentic_ecology)
@@ -27,28 +26,28 @@ right set of agent skills, can eliminate that barrier.
 
 Think of this project not as a tool, but as a tool-building tool.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 🚀 Getting started
 
 > [!WARNING]
->  Unless you have extensive experience with agentic software engineering, we
->  recommend that you set up your agentic coding environment so that the agent
->  asks your permission before performing any operation on your machine on your
->  behalf or to interact with files outside of the workspace's root directory.
->  Vet every command the agent intends to run on your behalf and carefully
->  inspect the code it requests to execute, as agent mistakes can happen. Avoid
->  letting the agent perform operations on your data without backing it up and
->  taking other relevant precautions.
+> Unless you have extensive experience with agentic software engineering, we
+> recommend that you set up your agentic coding environment so that the agent
+> asks your permission before performing any operation on your machine on your
+> behalf or to interact with files outside of the workspace's root directory.
+> Vet every command the agent intends to run on your behalf and carefully
+> inspect the code it requests to execute, as agent mistakes can happen. Avoid
+> letting the agent perform operations on your data without backing it up and
+> taking other relevant precautions.
 
 ### 1. Verify and install prerequisites
 
 Verify that the following prerequisites are installed:
 
-* `node >=22.20.0`
-* `npx`
-* `git`
-* `uv`
+- `node >=22.20.0`
+- `npx`
+- `git`
+- `uv`
 
 If you need help on this, prompt your agent:
 
@@ -77,7 +76,7 @@ Open your agentic development platform and prompt your agent:
 > Use the `agentic-ecology-init` skill to initialize an agentic ecology project
 > in `<my_project_directory>`.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 🛠️ Demo workflow
 
@@ -98,15 +97,15 @@ songs.
 
 The agent:
 
-1.  Downloads and unzips the Powdermill audio data in `data/powdermill`.
-2.  Identifies all audio files in that directory.
-3.  Runs the Perch 2.0 model over them to build an audio index.
-4.  Creates a vector database in the `databases/` folder of the project to store
-    everything. *(This step may take some time, especially if executing on CPU.
-    Expect around 15 minutes.)*
-5.  Builds a web application for you to browse, search, and annotate the
-    database.
-6.  Presents you with instructions on how to access and use the web application.
+1. Downloads and unzips the Powdermill audio data in `data/powdermill`.
+1. Identifies all audio files in that directory.
+1. Runs the Perch 2.0 model over them to build an audio index.
+1. Creates a vector database in the `databases/` folder of the project to store
+   everything. *(This step may take some time, especially if executing on CPU.
+   Expect around 15 minutes.)*
+1. Builds a web application for you to browse, search, and annotate the
+   database.
+1. Presents you with instructions on how to access and use the web application.
 
 #### Try out the web app
 
@@ -123,7 +122,7 @@ entering `xc565524` into the query URI bar.
 The agent will autonomously figure how to modify the existing code to accomplish
 that, restart the backend server, and prompt you to reload the webpage.
 
---------------------------------------------------------------------------------
+______________________________________________________________________
 
 ## 💡 Key takeaway
 
@@ -150,6 +149,5 @@ This means that building the right tool for your needs is within your reach:
 don't hesitate to state your needs; to question the agent; to ask it to clarify,
 self-correct its mistakes, and amend its instructions and skills; to nudge it in
 the right direction if it starts veering down the wrong path.
-
 
 *This is not an officially supported Google product.*

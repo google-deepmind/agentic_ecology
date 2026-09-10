@@ -4,6 +4,36 @@ Detailed instructions and code examples for performing object detection,
 classification, and embedding extraction using `speciesnet` and saving them into
 a `perch-hoplite` database.
 
+## Script Entry Point & Safety Imports
+
+Camera trap ingestion scripts load PyTorch (via `yolov5` in SpeciesNet), TensorFlow,
+and Perch Hoplite (PyArrow). Adhere to the safety import sequence and local cache definitions:
+
+```python
+import os
+import pathlib
+
+# Configure local caches for sandboxed or headless environments
+os.environ.setdefault("KERAS_HOME", str(pathlib.Path.cwd() / ".keras"))
+os.environ.setdefault("KAGGLEHUB_CACHE", str(pathlib.Path.cwd() / ".cache" / "kagglehub"))
+
+# Rule 1b: yolov5 must precede tensorflow to prevent segmentation fault
+import yolov5  # noqa: F401 # isort: skip
+
+# Rule 1: tensorflow must precede perch_hoplite / pyarrow to prevent macOS Abseil deadlock
+import tensorflow as tf  # noqa: F401 # isort: skip
+
+import logging
+
+
+class SQLSuppressFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "Executed SQL statement" not in record.getMessage()
+
+
+logging.getLogger("absl").addFilter(SQLSuppressFilter())
+```
+
 ## Model Ingestion Setup
 
 ### 1. Database Configuration
@@ -99,13 +129,14 @@ if captured_embeddings:
 
 ### 4. Crop Bounding Box Calculations
 
-MegaDetector returns normalized relative coordinates: `[xmin, ymin, width, height]`. Convert them to absolute pixel coordinates for PIL cropping:
+MegaDetector returns normalized relative coordinates: `[xmin, ymin, width, height]`.
+Clamp coordinates to ensure valid PIL crop boundaries:
 
 ```python
-left = int(bbox[0] * img.width)
-top = int(bbox[1] * img.height)
-right = int((bbox[0] + bbox[2]) * img.width)
-bottom = int((bbox[1] + bbox[3]) * img.height)
+left = max(0, min(img.width - 1, int(bbox[0] * img.width)))
+top = max(0, min(img.height - 1, int(bbox[1] * img.height)))
+right = max(left + 1, min(img.width, int((bbox[0] + bbox[2]) * img.width)))
+bottom = max(top + 1, min(img.height, int((bbox[1] + bbox[3]) * img.height)))
 
 crop_img = img.crop((left, top, right, bottom))
 ```
@@ -127,14 +158,18 @@ recording_id = db.insert_recording(
 db.insert_window(
     recording_id=recording_id,
     offsets=[
-        bbox[0],
-        bbox[1],
-        bbox[0] + bbox[2],
-        bbox[1] + bbox[3],
+        float(bbox[0]),
+        float(bbox[1]),
+        float(bbox[0] + bbox[2]),
+        float(bbox[1] + bbox[3]),
     ],  # Store relative bounding box coordinates
     embedding=embedding_vector,
     handle_duplicates="allow",
 )
+
+# CRITICAL: Always commit at the end of ingestion (and periodically during large batches).
+# db.commit() commits the SQLite transaction AND flushes the USearch index to disk (usearch.index).
+db.commit()
 ```
 
 ## Custom Image Similarity Search (On-the-Fly Embedding)
@@ -154,3 +189,21 @@ its embedding on-the-fly:
    feature vector, cast it to `float16`, and run the USearch similarity search.
 1. **Caching**: Cache both the query preview image and the extracted embedding
    to prevent duplicate downloads and model inference passes on page refreshes.
+
+## Querying & Neighbor Lookup
+
+When querying the USearch index via `db.search()`, neighbor keys (`match.window_id`)
+are returned as NumPy integers (`numpy.uint64`). Standard Python `sqlite3` parameterized
+queries (`WHERE id = ?`) do not match NumPy scalar types against integer columns.
+
+Always cast the window ID to Python's native `int`:
+
+```python
+for match in search_results:
+    window_id = int(match.window_id)  # Crucial: cast numpy.uint64 to native int
+    cursor = db._get_cursor()
+    row = cursor.execute(
+        "SELECT w.id, r.filename, w.offsets FROM windows w JOIN recordings r ON w.recording_id = r.id WHERE w.id = ?",
+        (window_id,)
+    ).fetchone()
+```

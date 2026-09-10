@@ -142,10 +142,11 @@ symbols, causing a compiler deadlock.
 - **Rule**: Ensure this import precedes any imports of `perch_hoplite`,
   `pandas`, `gcsfs`, `fsspec`, or packages that transitively load `pyarrow`.
 
-### 1b. Linux PyTorch & TensorFlow Import Conflict (Segmentation Fault)
+### 1b. PyTorch (YOLOv5) & TensorFlow Import Conflict (Segmentation Fault)
 
-On Linux, there is a symbol conflict between PyTorch (`yolov5`) and TensorFlow.
-If `tensorflow` is imported first, subsequent imports of `yolov5` will segfault.
+Across platforms (both macOS and Linux), there is a symbol conflict between
+PyTorch (`yolov5`) and TensorFlow. If `tensorflow` is imported first, subsequent
+initialization of `yolov5` will segfault (exit code 139).
 
 - **Rule**: If a script imports both `yolov5` and `tensorflow`, `import yolov5` MUST be placed at the absolute top of the script, preceding `import tensorflow as tf`.
 
@@ -168,3 +169,26 @@ clogging logs.
 
   logging.getLogger("absl").addFilter(SQLSuppressFilter())
   ```
+
+### 3. Persisting Hoplite Database Transactions and Vector Indexes (`db.commit()`)
+
+In `perch-hoplite`, `SQLiteUSearchDB` operates within an active SQLite
+transaction and buffers in-memory additions to the USearch index. If `db.commit()`
+is not explicitly called before the script exits, all pending SQLite inserts
+(`recordings`, `windows`, `annotations`) are rolled back, and the USearch index is
+not saved to disk (as `db.commit()` internally triggers `self.ui.save()`).
+
+- **Rule**: Always call `db.commit()` at the conclusion of ingestion or insertion
+  scripts, and periodically during large batch operations, to ensure database
+  transactions and the USearch vector index (`usearch.index`) are persisted to disk.
+
+### 4. NumPy Scalar Types in SQLite Parameter Binding
+
+When querying SQLite tables using window IDs or scores returned by USearch or
+NumPy operations, note that Python's standard `sqlite3` driver does not
+automatically coerce NumPy scalar integers (`numpy.uint64`, `numpy.int64`) in
+parameterized queries (e.g., `WHERE id = ?`). Passing them directly can cause
+queries to fail or return no matches.
+
+- **Rule**: Always explicitly cast NumPy identifiers to native Python `int`
+  (e.g. `int(window_id)`) before binding them into SQL query parameters.
