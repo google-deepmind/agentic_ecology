@@ -20,13 +20,16 @@ UIs to visualize, rank, filter, and annotate vector databases.
 """
 
 import abc
+import copy
 import enum
 import http.server
 import json
 import math
 import os
 import socketserver
+import stat
 import sys
+import tempfile
 import threading
 import time
 from typing import Any
@@ -279,8 +282,23 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
         filepath = os.path.join(self.db_dir, f"{database_id}.json")
 
         if database_id in self.loaded_databases:
-            with open(filepath, "w") as f:
-                json.dump(self.loaded_databases[database_id], f, indent=2)
+            temporary_path = None
+            try:
+                # Write beside the destination so replacement stays on one filesystem.
+                with tempfile.NamedTemporaryFile(
+                    mode="w", encoding="utf-8", dir=self.db_dir,
+                    prefix=f".{database_id}.", suffix=".tmp", delete=False,
+                ) as f:
+                    temporary_path = f.name
+                    json.dump(self.loaded_databases[database_id], f, indent=2)
+                os.chmod(temporary_path, stat.S_IMODE(os.stat(filepath).st_mode))
+                os.replace(temporary_path, filepath)
+            finally:
+                if temporary_path is not None:
+                    try:
+                        os.unlink(temporary_path)
+                    except FileNotFoundError:
+                        pass
 
     def list_databases(self) -> list[str]:
         try:
@@ -390,7 +408,9 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
     ) -> None:
         db_data, db_lock = self._get_database(database_id)
         with db_lock:
+            had_annotations = "annotations" in db_data
             annotations = db_data.setdefault("annotations", {})
+            previous_annotations = copy.deepcopy(annotations)
             item_id_str = str(item_id)
             if annotation == AnnotationValue.UNCERTAIN:
                 if item_id_str in annotations and label in annotations[item_id_str]:
@@ -400,7 +420,15 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
             else:
                 annotations.setdefault(item_id_str, {})[label] = annotation
 
-            self._save_database(database_id)
+            try:
+                self._save_database(database_id)
+            except Exception:
+                # A rejected update must not appear in searches or a later save.
+                annotations.clear()
+                annotations.update(previous_annotations)
+                if not had_annotations:
+                    db_data.pop("annotations")
+                raise
 
     def train_classifier(self, database_id: str, label: str) -> dict[str, Any]:
         db_data, db_lock = self._get_database(database_id)
