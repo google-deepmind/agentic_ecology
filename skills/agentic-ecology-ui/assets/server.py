@@ -20,7 +20,6 @@ UIs to visualize, rank, filter, and annotate vector databases.
 """
 
 import abc
-import copy
 import enum
 import http.server
 import json
@@ -291,7 +290,8 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
                 ) as f:
                     temporary_path = f.name
                     json.dump(self.loaded_databases[database_id], f, indent=2)
-                os.chmod(temporary_path, stat.S_IMODE(os.stat(filepath).st_mode))
+                if os.path.exists(filepath):
+                    os.chmod(temporary_path, stat.S_IMODE(os.stat(filepath).st_mode))
                 os.replace(temporary_path, filepath)
             finally:
                 if temporary_path is not None:
@@ -408,26 +408,26 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
     ) -> None:
         db_data, db_lock = self._get_database(database_id)
         with db_lock:
-            had_annotations = "annotations" in db_data
             annotations = db_data.setdefault("annotations", {})
-            previous_annotations = copy.deepcopy(annotations)
             item_id_str = str(item_id)
-            if annotation == AnnotationValue.UNCERTAIN:
-                if item_id_str in annotations and label in annotations[item_id_str]:
-                    del annotations[item_id_str][label]
-                    if not annotations[item_id_str]:
-                        del annotations[item_id_str]
-            else:
-                annotations.setdefault(item_id_str, {})[label] = annotation
+            prev_annotation = annotations.get(item_id_str, {}).get(
+                label, AnnotationValue.UNCERTAIN
+            )
 
+            def _set(val: AnnotationValue) -> None:
+                if val == AnnotationValue.UNCERTAIN:
+                    if label in annotations.get(item_id_str, {}):
+                        del annotations[item_id_str][label]
+                        if not annotations[item_id_str]:
+                            del annotations[item_id_str]
+                else:
+                    annotations.setdefault(item_id_str, {})[label] = val
+
+            _set(annotation)
             try:
                 self._save_database(database_id)
             except Exception:
-                # A rejected update must not appear in searches or a later save.
-                annotations.clear()
-                annotations.update(previous_annotations)
-                if not had_annotations:
-                    db_data.pop("annotations")
+                _set(prev_annotation)
                 raise
 
     def train_classifier(self, database_id: str, label: str) -> dict[str, Any]:
