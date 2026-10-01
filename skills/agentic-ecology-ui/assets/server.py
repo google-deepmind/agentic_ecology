@@ -26,7 +26,9 @@ import json
 import math
 import os
 import socketserver
+import stat
 import sys
+import tempfile
 import threading
 import time
 from typing import Any
@@ -279,8 +281,24 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
         filepath = os.path.join(self.db_dir, f"{database_id}.json")
 
         if database_id in self.loaded_databases:
-            with open(filepath, "w") as f:
-                json.dump(self.loaded_databases[database_id], f, indent=2)
+            temporary_path = None
+            try:
+                # Write beside the destination so replacement stays on one filesystem.
+                with tempfile.NamedTemporaryFile(
+                    mode="w", encoding="utf-8", dir=self.db_dir,
+                    prefix=f".{database_id}.", suffix=".tmp", delete=False,
+                ) as f:
+                    temporary_path = f.name
+                    json.dump(self.loaded_databases[database_id], f, indent=2)
+                if os.path.exists(filepath):
+                    os.chmod(temporary_path, stat.S_IMODE(os.stat(filepath).st_mode))
+                os.replace(temporary_path, filepath)
+            finally:
+                if temporary_path is not None:
+                    try:
+                        os.unlink(temporary_path)
+                    except FileNotFoundError:
+                        pass
 
     def list_databases(self) -> list[str]:
         try:
@@ -392,15 +410,25 @@ class JSONDatabaseAdapter(BaseDatabaseAdapter):
         with db_lock:
             annotations = db_data.setdefault("annotations", {})
             item_id_str = str(item_id)
-            if annotation == AnnotationValue.UNCERTAIN:
-                if item_id_str in annotations and label in annotations[item_id_str]:
-                    del annotations[item_id_str][label]
-                    if not annotations[item_id_str]:
-                        del annotations[item_id_str]
-            else:
-                annotations.setdefault(item_id_str, {})[label] = annotation
+            prev_annotation = annotations.get(item_id_str, {}).get(
+                label, AnnotationValue.UNCERTAIN
+            )
 
-            self._save_database(database_id)
+            def _set(val: AnnotationValue) -> None:
+                if val == AnnotationValue.UNCERTAIN:
+                    if label in annotations.get(item_id_str, {}):
+                        del annotations[item_id_str][label]
+                        if not annotations[item_id_str]:
+                            del annotations[item_id_str]
+                else:
+                    annotations.setdefault(item_id_str, {})[label] = val
+
+            _set(annotation)
+            try:
+                self._save_database(database_id)
+            except Exception:
+                _set(prev_annotation)
+                raise
 
     def train_classifier(self, database_id: str, label: str) -> dict[str, Any]:
         db_data, db_lock = self._get_database(database_id)
